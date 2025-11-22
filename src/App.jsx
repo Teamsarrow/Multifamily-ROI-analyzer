@@ -862,21 +862,19 @@ ${unitMixDetails}
 
   {/* Cash-on-cash ROI */}
 <div className="kpi-box kpi-cashoncash bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
-  
   <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-    Cash-on<br />cash
+    Cash-on-cash
   </div>
 
-  <div className="kpi-value mt-3 font-extrabold text-slate-800">
+  {/* Value uses extra margin on web, tighter margin in print */}
+  <div className="kpi-value mt-3 print:mt-1 font-extrabold text-slate-800">
     {formatPercent(cashOnCashROI)}
   </div>
 
   <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
     ROI
   </div>
-
 </div>
-
   {/* Cap Rate */}
   <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
     <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
