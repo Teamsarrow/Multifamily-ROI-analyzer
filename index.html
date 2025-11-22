@@ -5,45 +5,51 @@
     <title>Multifamily ROI Analyzer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Print-specific KPI styling -->
+    <!-- Tailwind (for base styling on this shell page) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Print-specific KPI sizing + layout -->
     <style>
       @media print {
-        /* KPI value (middle number) */
+        /* KPI middle number */
         .kpi-value {
-          font-size: 15pt !important;
-          line-height: 1.1 !important;
+          font-size: 13pt !important;
+          line-height: 1.05 !important;
+          word-break: break-word !important;
         }
 
-        /* KPI title (top text) */
+        /* KPI top label (title) */
         .kpi-title {
           font-size: 7pt !important;
           letter-spacing: 0.12em !important;
         }
 
-        /* KPI bottom label */
+        /* KPI bottom label (subtext) */
         .kpi-sub {
           font-size: 7pt !important;
-          letter-spacing: 0.1em !important;
+          letter-spacing: 0.10em !important;
           margin-top: 2px !important;
         }
 
-        /* KPI box height control */
+        /* KPI box height / vertical spacing */
         .kpi-box {
-          height: 90px !important;
-          padding-top: 6px !important;
-          padding-bottom: 6px !important;
+          height: 110px !important;
+          padding-top: 8px !important;
+          padding-bottom: 8px !important;
+        }
+
+        /* Ensure colors render correctly in print */
+        html,
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
       }
     </style>
-
-    <!-- Tailwind via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
-  <body class="antialiased bg-slate-50">
+  <body class="bg-slate-50">
     <div id="root"></div>
-
-    <!-- Vite / React entry -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
