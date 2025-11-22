@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Calculator,
   Home,
@@ -10,6 +10,8 @@ import {
   MapPin,
   Copy
 } from 'lucide-react';
+
+const STORAGE_KEY = 'mf_roi_scenarios_v1';
 
 const App = () => {
   // --- State Management ---
@@ -50,6 +52,144 @@ const App = () => {
     { id: 3, beds: 1, baths: 1, rent: 950 },
     { id: 4, beds: 1, baths: 1, rent: 950 }
   ]);
+
+  // Scenarios
+  const [scenarios, setScenarios] = useState([]);
+  const [selectedScenarioId, setSelectedScenarioId] = useState(null);
+
+  // Load scenarios from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) setScenarios(parsed);
+      }
+    } catch (e) {
+      console.error('Error loading scenarios', e);
+    }
+  }, []);
+
+  const persistScenarios = (next) => {
+    setScenarios(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch (e) {
+      console.error('Error saving scenarios', e);
+    }
+  };
+
+  const getCurrentScenarioData = () => ({
+    address,
+    mlsNumber,
+    purchasePrice,
+    downPayment,
+    interestRate,
+    loanTerm,
+    closingCosts,
+    initialCapEx,
+    vacancyRate,
+    maintenanceAnnual,
+    otherExpenses,
+    propertyTaxRate,
+    insuranceAnnual,
+    managementType,
+    managementPercent,
+    managementFlat,
+    units
+  });
+
+  const applyScenarioData = (data) => {
+    if (!data) return;
+
+    setAddress(data.address ?? '');
+    setMlsNumber(data.mlsNumber ?? '');
+    setPurchasePrice(data.purchasePrice ?? 0);
+    setDownPayment(data.downPayment ?? 0);
+    setInterestRate(data.interestRate ?? 0);
+    setLoanTerm(data.loanTerm ?? 30);
+    setClosingCosts(data.closingCosts ?? 0);
+    setInitialCapEx(data.initialCapEx ?? 0);
+    setVacancyRate(data.vacancyRate ?? 0);
+    setMaintenanceAnnual(data.maintenanceAnnual ?? 0);
+    setOtherExpenses(data.otherExpenses ?? 0);
+    setPropertyTaxRate(data.propertyTaxRate ?? 0);
+    setInsuranceAnnual(data.insuranceAnnual ?? 0);
+    setManagementType(data.managementType ?? 'percent');
+    setManagementPercent(data.managementPercent ?? 0);
+    setManagementFlat(data.managementFlat ?? 0);
+    setUnits(
+      Array.isArray(data.units) && data.units.length
+        ? data.units.map((u) => ({ ...u }))
+        : [
+            { id: 1, beds: 2, baths: 1, rent: 1200 },
+            { id: 2, beds: 2, baths: 1, rent: 1200 },
+            { id: 3, beds: 1, baths: 1, rent: 950 },
+            { id: 4, beds: 1, baths: 1, rent: 950 }
+          ]
+    );
+  };
+
+  const handleSaveAsNewScenario = () => {
+    const defaultName = address
+      ? `${address} – Scenario ${scenarios.length + 1}`
+      : `Scenario ${scenarios.length + 1}`;
+
+    const name = window.prompt('Scenario name', defaultName);
+    if (!name) return;
+
+    const id = Date.now();
+    const newScenario = {
+      id,
+      name,
+      createdAt: new Date().toISOString(),
+      data: getCurrentScenarioData()
+    };
+
+    const next = [...scenarios, newScenario];
+    persistScenarios(next);
+    setSelectedScenarioId(id);
+  };
+
+  const handleSaveScenario = () => {
+    // If no scenario selected yet, treat as “Save as New”
+    if (!selectedScenarioId) {
+      handleSaveAsNewScenario();
+      return;
+    }
+
+    const next = scenarios.map((s) =>
+      s.id === selectedScenarioId ? { ...s, data: getCurrentScenarioData() } : s
+    );
+    persistScenarios(next);
+  };
+
+  const handleSelectScenario = (e) => {
+    const value = e.target.value;
+    if (!value) {
+      setSelectedScenarioId(null);
+      return;
+    }
+    const id = Number(value);
+    const scenario = scenarios.find((s) => s.id === id);
+    if (scenario) {
+      setSelectedScenarioId(id);
+      applyScenarioData(scenario.data);
+    }
+  };
+
+  const handleDeleteScenario = () => {
+    if (!selectedScenarioId) return;
+    const scenario = scenarios.find((s) => s.id === selectedScenarioId);
+    const ok = window.confirm(
+      `Delete scenario "${scenario?.name || ''}"? This cannot be undone.`
+    );
+    if (!ok) return;
+
+    const next = scenarios.filter((s) => s.id !== selectedScenarioId);
+    persistScenarios(next);
+    setSelectedScenarioId(null);
+  };
 
   // Formatting helpers
   const formatCurrency = (val) =>
@@ -141,7 +281,7 @@ const App = () => {
     dscr === 0
       ? 'N/A'
       : dscr < 1.2
-      ? 'Red (Below Lender Minimum)'
+      ? 'Yellow (Below Min)'
       : dscr < 1.35
       ? 'Yellow (Borderline)'
       : 'Green (Strong)';
@@ -315,7 +455,64 @@ ${unitMixDetails}
           </div>
         </div>
 
-        {/* Thin divider line under header */}
+        {/* Scenario bar */}
+        {scenarios.length > 0 ? (
+          <div className="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2 text-xs text-slate-600">
+            <div className="flex items-center gap-2">
+              <span className="uppercase tracking-[0.16em] text-slate-400 font-semibold">
+                Saved Scenarios
+              </span>
+              <select
+                value={selectedScenarioId || ''}
+                onChange={handleSelectScenario}
+                className="border border-slate-300 rounded-md px-2 py-1 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select scenario…</option>
+                {scenarios.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={handleSaveScenario}
+                className="px-3 py-1.5 rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50"
+              >
+                Save
+              </button>
+              <button
+                onClick={handleSaveAsNewScenario}
+                className="px-3 py-1.5 rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50"
+              >
+                Save as New
+              </button>
+              <button
+                onClick={handleDeleteScenario}
+                disabled={!selectedScenarioId}
+                className={`px-3 py-1.5 rounded-md border ${
+                  selectedScenarioId
+                    ? 'border-red-300 text-red-600 hover:bg-red-50'
+                    : 'border-slate-200 text-slate-300 cursor-not-allowed'
+                }`}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-3 flex justify-end">
+            <button
+              onClick={handleSaveAsNewScenario}
+              className="px-3 py-1.5 rounded-md border border-slate-300 text-xs text-slate-600 hover:bg-slate-50"
+            >
+              Save current inputs as scenario
+            </button>
+          </div>
+        )}
+
+        {/* Thin divider line under header, CBRE-style */}
         <div className="border-b border-slate-200 mt-4" />
       </div>
 
@@ -359,7 +556,7 @@ ${unitMixDetails}
         </div>
       </div>
 
-      {/* Main Content: 2-column layout */}
+      {/* Main Content */}
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT COLUMN: INPUTS */}
         <div className="lg:col-span-5 space-y-6">
@@ -702,69 +899,77 @@ ${unitMixDetails}
 
         {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
         <div className="lg:col-span-7 space-y-6">
-          {/* KPI Cards – fixed label height so numbers align */}
+          {/* KPI Cards – Fully Aligned */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Annual Cash Flow */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-32 flex flex-col items-center">
-              <div className="h-10 flex flex-col justify-center">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
+              <div className="flex flex-col">
                 <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  Annual Cash Flow
+                  Annual
+                  <br />
+                  Cash Flow
+                </div>
+                <div
+                  className={`mt-2 text-2xl font-extrabold ${
+                    annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
+                  }`}
+                >
+                  {formatCurrency(annualCashFlow)}
                 </div>
               </div>
-              <div
-                className={`mt-1 text-2xl font-extrabold ${
-                  annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
-                }`}
-              >
-                {formatCurrency(annualCashFlow)}
-              </div>
-              <div className="mt-2 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
                 Per Year
               </div>
             </div>
 
             {/* Cash-on-Cash ROI */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-32 flex flex-col items-center">
-              <div className="h-10 flex flex-col justify-center">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
+              <div className="flex flex-col">
                 <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  Cash-on-Cash ROI
+                  Cash-On-Cash
+                  <br />
+                  ROI
+                </div>
+                <div className="mt-2 text-2xl font-extrabold text-slate-800">
+                  {formatPercent(cashOnCashROI)}
                 </div>
               </div>
-              <div className="mt-1 text-2xl font-extrabold text-slate-800">
-                {formatPercent(cashOnCashROI)}
-              </div>
-              <div className="mt-2 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
                 On Initial Cash
               </div>
             </div>
 
             {/* Cap Rate */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-32 flex flex-col items-center">
-              <div className="h-10 flex flex-col justify-center">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
+              <div className="flex flex-col">
                 <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  Cap Rate
+                  Cap
+                  <br />
+                  Rate
+                </div>
+                <div className="mt-2 text-2xl font-extrabold text-slate-800">
+                  {formatPercent(capRate)}
                 </div>
               </div>
-              <div className="mt-1 text-2xl font-extrabold text-slate-800">
-                {formatPercent(capRate)}
-              </div>
-              <div className="mt-2 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
                 On Purchase Price
               </div>
             </div>
 
             {/* DSCR */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-32 flex flex-col items-center">
-              <div className="h-10 flex flex-col justify-center">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
+              <div className="flex flex-col">
                 <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
                   DSCR
+                  <br />
+                  {dscrText}
+                </div>
+                <div className="mt-2 text-2xl font-extrabold text-slate-800">
+                  {formatNumber(dscr)}
                 </div>
               </div>
-              <div className="mt-1 text-2xl font-extrabold text-slate-800">
-                {formatNumber(dscr)}
-              </div>
-              <div className="mt-2 text-[0.65rem] text-slate-500 truncate max-w-[95%]">
-                {dscrText}
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                Coverage
               </div>
             </div>
           </div>
