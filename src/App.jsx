@@ -11,7 +11,12 @@ import {
   Copy
 } from 'lucide-react';
 
-const STORAGE_KEY = 'mf_roi_scenarios_v1';
+const DEFAULT_UNITS = [
+  { id: 1, beds: 2, baths: 1, rent: 1200 },
+  { id: 2, beds: 2, baths: 1, rent: 1200 },
+  { id: 3, beds: 1, baths: 1, rent: 950 },
+  { id: 4, beds: 1, baths: 1, rent: 950 }
+];
 
 const App = () => {
   // --- State Management ---
@@ -46,150 +51,29 @@ const App = () => {
   const [managementFlat, setManagementFlat] = useState(3000);
 
   // Units
-  const [units, setUnits] = useState([
-    { id: 1, beds: 2, baths: 1, rent: 1200 },
-    { id: 2, beds: 2, baths: 1, rent: 1200 },
-    { id: 3, beds: 1, baths: 1, rent: 950 },
-    { id: 4, beds: 1, baths: 1, rent: 950 }
-  ]);
+  const [units, setUnits] = useState(DEFAULT_UNITS);
 
-  // Scenarios
-  const [scenarios, setScenarios] = useState([]);
-  const [selectedScenarioId, setSelectedScenarioId] = useState(null);
-
-  // Load scenarios from localStorage on mount
-  useEffect(() => {
+  // Saved scenarios
+  const [scenarios, setScenarios] = useState(() => {
+    if (typeof window === 'undefined') return [];
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) setScenarios(parsed);
-      }
-    } catch (e) {
-      console.error('Error loading scenarios', e);
+      const raw = window.localStorage.getItem('mf_roi_scenarios');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
     }
-  }, []);
+  });
+  const [selectedScenarioKey, setSelectedScenarioKey] = useState('');
 
-  const persistScenarios = (next) => {
-    setScenarios(next);
+  // Persist scenarios
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      window.localStorage.setItem('mf_roi_scenarios', JSON.stringify(scenarios));
     } catch (e) {
       console.error('Error saving scenarios', e);
     }
-  };
-
-  const getCurrentScenarioData = () => ({
-    address,
-    mlsNumber,
-    purchasePrice,
-    downPayment,
-    interestRate,
-    loanTerm,
-    closingCosts,
-    initialCapEx,
-    vacancyRate,
-    maintenanceAnnual,
-    otherExpenses,
-    propertyTaxRate,
-    insuranceAnnual,
-    managementType,
-    managementPercent,
-    managementFlat,
-    units
-  });
-
-  const applyScenarioData = (data) => {
-    if (!data) return;
-
-    setAddress(data.address ?? '');
-    setMlsNumber(data.mlsNumber ?? '');
-    setPurchasePrice(data.purchasePrice ?? 0);
-    setDownPayment(data.downPayment ?? 0);
-    setInterestRate(data.interestRate ?? 0);
-    setLoanTerm(data.loanTerm ?? 30);
-    setClosingCosts(data.closingCosts ?? 0);
-    setInitialCapEx(data.initialCapEx ?? 0);
-    setVacancyRate(data.vacancyRate ?? 0);
-    setMaintenanceAnnual(data.maintenanceAnnual ?? 0);
-    setOtherExpenses(data.otherExpenses ?? 0);
-    setPropertyTaxRate(data.propertyTaxRate ?? 0);
-    setInsuranceAnnual(data.insuranceAnnual ?? 0);
-    setManagementType(data.managementType ?? 'percent');
-    setManagementPercent(data.managementPercent ?? 0);
-    setManagementFlat(data.managementFlat ?? 0);
-    setUnits(
-      Array.isArray(data.units) && data.units.length
-        ? data.units.map((u) => ({ ...u }))
-        : [
-            { id: 1, beds: 2, baths: 1, rent: 1200 },
-            { id: 2, beds: 2, baths: 1, rent: 1200 },
-            { id: 3, beds: 1, baths: 1, rent: 950 },
-            { id: 4, beds: 1, baths: 1, rent: 950 }
-          ]
-    );
-  };
-
-  const handleSaveAsNewScenario = () => {
-    const defaultName = address
-      ? `${address} – Scenario ${scenarios.length + 1}`
-      : `Scenario ${scenarios.length + 1}`;
-
-    const name = window.prompt('Scenario name', defaultName);
-    if (!name) return;
-
-    const id = Date.now();
-    const newScenario = {
-      id,
-      name,
-      createdAt: new Date().toISOString(),
-      data: getCurrentScenarioData()
-    };
-
-    const next = [...scenarios, newScenario];
-    persistScenarios(next);
-    setSelectedScenarioId(id);
-  };
-
-  const handleSaveScenario = () => {
-    // If no scenario selected yet, treat as “Save as New”
-    if (!selectedScenarioId) {
-      handleSaveAsNewScenario();
-      return;
-    }
-
-    const next = scenarios.map((s) =>
-      s.id === selectedScenarioId ? { ...s, data: getCurrentScenarioData() } : s
-    );
-    persistScenarios(next);
-  };
-
-  const handleSelectScenario = (e) => {
-    const value = e.target.value;
-    if (!value) {
-      setSelectedScenarioId(null);
-      return;
-    }
-    const id = Number(value);
-    const scenario = scenarios.find((s) => s.id === id);
-    if (scenario) {
-      setSelectedScenarioId(id);
-      applyScenarioData(scenario.data);
-    }
-  };
-
-  const handleDeleteScenario = () => {
-    if (!selectedScenarioId) return;
-    const scenario = scenarios.find((s) => s.id === selectedScenarioId);
-    const ok = window.confirm(
-      `Delete scenario "${scenario?.name || ''}"? This cannot be undone.`
-    );
-    if (!ok) return;
-
-    const next = scenarios.filter((s) => s.id !== selectedScenarioId);
-    persistScenarios(next);
-    setSelectedScenarioId(null);
-  };
+  }, [scenarios]);
 
   // Formatting helpers
   const formatCurrency = (val) =>
@@ -281,12 +165,110 @@ const App = () => {
     dscr === 0
       ? 'N/A'
       : dscr < 1.2
-      ? 'Yellow (Below Min)'
+      ? 'Red (Below Lender Minimum)'
       : dscr < 1.35
       ? 'Yellow (Borderline)'
       : 'Green (Strong)';
 
-  // --- Handlers ---
+  // --- Scenario helpers ---
+
+  const getCurrentScenarioData = () => ({
+    address,
+    mlsNumber,
+    purchasePrice,
+    downPayment,
+    interestRate,
+    loanTerm,
+    closingCosts,
+    initialCapEx,
+    vacancyRate,
+    maintenanceAnnual,
+    otherExpenses,
+    propertyTaxRate,
+    insuranceAnnual,
+    managementType,
+    managementPercent,
+    managementFlat,
+    units
+  });
+
+  const loadScenarioData = (data) => {
+    if (!data) return;
+    setAddress(data.address || '');
+    setMlsNumber(data.mlsNumber || '');
+    setPurchasePrice(data.purchasePrice ?? 0);
+    setDownPayment(data.downPayment ?? 0);
+    setInterestRate(data.interestRate ?? 0);
+    setLoanTerm(data.loanTerm ?? 0);
+    setClosingCosts(data.closingCosts ?? 0);
+    setInitialCapEx(data.initialCapEx ?? 0);
+    setVacancyRate(data.vacancyRate ?? 0);
+    setMaintenanceAnnual(data.maintenanceAnnual ?? 0);
+    setOtherExpenses(data.otherExpenses ?? 0);
+    setPropertyTaxRate(data.propertyTaxRate ?? 0);
+    setInsuranceAnnual(data.insuranceAnnual ?? 0);
+    setManagementType(data.managementType || 'percent');
+    setManagementPercent(data.managementPercent ?? 0);
+    setManagementFlat(data.managementFlat ?? 0);
+    setUnits(
+      Array.isArray(data.units) && data.units.length > 0
+        ? data.units
+        : DEFAULT_UNITS
+    );
+  };
+
+  const handleSaveAsNew = () => {
+    const defaultName =
+      address && address.trim().length > 0
+        ? `${address} – Scenario ${scenarios.length + 1}`
+        : `Scenario ${scenarios.length + 1}`;
+    const name = window.prompt('Scenario name:', defaultName);
+    if (!name) return;
+    const key = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const newScenario = {
+      key,
+      name,
+      data: getCurrentScenarioData()
+    };
+    setScenarios((prev) => [...prev, newScenario]);
+    setSelectedScenarioKey(key);
+  };
+
+  const handleSave = () => {
+    // If nothing selected yet, treat "Save" as "Save As New"
+    if (!selectedScenarioKey) {
+      handleSaveAsNew();
+      return;
+    }
+    setScenarios((prev) =>
+      prev.map((s) =>
+        s.key === selectedScenarioKey
+          ? { ...s, data: getCurrentScenarioData() }
+          : s
+      )
+    );
+  };
+
+  const handleDelete = () => {
+    if (!selectedScenarioKey) return;
+    const confirmDelete = window.confirm('Delete this scenario?');
+    if (!confirmDelete) return;
+    setScenarios((prev) =>
+      prev.filter((s) => s.key !== selectedScenarioKey)
+    );
+    setSelectedScenarioKey('');
+  };
+
+  const handleSelectScenario = (e) => {
+    const key = e.target.value;
+    setSelectedScenarioKey(key);
+    const scenario = scenarios.find((s) => s.key === key);
+    if (scenario) {
+      loadScenarioData(scenario.data);
+    }
+  };
+
+  // --- Other handlers ---
 
   const addUnit = () => {
     const newId =
@@ -397,10 +379,12 @@ ${unitMixDetails}
     setTimeout(() => setCopySuccess(''), 4000);
   };
 
+  // --- JSX ---
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-4 print:bg-white">
       {/* Header / Action Bar */}
-      <div className="max-w-6xl mx-auto mb-6 print:hidden">
+      <div className="max-w-6xl mx-auto mb-4 print:hidden">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           {/* Left: Logo + analysis label */}
           <div className="flex items-center gap-4">
@@ -455,65 +439,54 @@ ${unitMixDetails}
           </div>
         </div>
 
-        {/* Scenario bar */}
-        {scenarios.length > 0 ? (
-          <div className="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2 text-xs text-slate-600">
-            <div className="flex items-center gap-2">
-              <span className="uppercase tracking-[0.16em] text-slate-400 font-semibold">
-                Saved Scenarios
-              </span>
-              <select
-                value={selectedScenarioId || ''}
-                onChange={handleSelectScenario}
-                className="border border-slate-300 rounded-md px-2 py-1 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select scenario…</option>
-                {scenarios.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={handleSaveScenario}
-                className="px-3 py-1.5 rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50"
-              >
-                Save
-              </button>
-              <button
-                onClick={handleSaveAsNewScenario}
-                className="px-3 py-1.5 rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50"
-              >
-                Save as New
-              </button>
-              <button
-                onClick={handleDeleteScenario}
-                disabled={!selectedScenarioId}
-                className={`px-3 py-1.5 rounded-md border ${
-                  selectedScenarioId
-                    ? 'border-red-300 text-red-600 hover:bg-red-50'
-                    : 'border-slate-200 text-slate-300 cursor-not-allowed'
-                }`}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="mt-3 flex justify-end">
-            <button
-              onClick={handleSaveAsNewScenario}
-              className="px-3 py-1.5 rounded-md border border-slate-300 text-xs text-slate-600 hover:bg-slate-50"
-            >
-              Save current inputs as scenario
-            </button>
-          </div>
-        )}
-
-        {/* Thin divider line under header, CBRE-style */}
+        {/* Thin divider line under header */}
         <div className="border-b border-slate-200 mt-4" />
+      </div>
+
+      {/* Saved Scenarios Bar (web only) */}
+      <div className="max-w-6xl mx-auto mb-4 flex items-center justify-between gap-3 text-xs print:hidden">
+        <div className="flex items-center gap-2">
+          <span className="uppercase tracking-[0.18em] text-slate-500">
+            Saved Scenarios
+          </span>
+          <select
+            value={selectedScenarioKey}
+            onChange={handleSelectScenario}
+            className="border border-slate-300 rounded-md px-2 py-1 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select scenario...</option>
+            {scenarios.map((s) => (
+              <option key={s.key} value={s.key}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSave}
+            className="px-3 py-1 rounded-md border border-slate-300 text-slate-700 bg-white hover:bg-slate-100 transition-colors"
+          >
+            Save
+          </button>
+          <button
+            onClick={handleSaveAsNew}
+            className="px-3 py-1 rounded-md border border-slate-300 text-slate-700 bg-white hover:bg-slate-100 transition-colors"
+          >
+            Save as New
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={!selectedScenarioKey}
+            className={`px-3 py-1 rounded-md border text-slate-700 transition-colors ${
+              selectedScenarioKey
+                ? 'border-red-300 bg-white hover:bg-red-50 hover:text-red-700'
+                : 'border-slate-200 bg-slate-100 text-slate-300 cursor-not-allowed'
+            }`}
+          >
+            Delete
+          </button>
+        </div>
       </div>
 
       {/* Printable Header (for PDF / printouts) */}
@@ -899,80 +872,76 @@ ${unitMixDetails}
 
         {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
         <div className="lg:col-span-7 space-y-6">
-         {/* KPI Cards – fully aligned, CBRE / M&M style */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* KPI Cards – brokerage style, aligned */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Annual Cash Flow */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
+              <div>
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  Annual<br />Cash Flow
+                </div>
+                <div
+                  className={`mt-2 text-2xl font-extrabold ${
+                    annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
+                  }`}
+                >
+                  {formatCurrency(annualCashFlow)}
+                </div>
+              </div>
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                Per Year
+              </div>
+            </div>
 
-  {/* Annual Cash Flow */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center grid grid-rows-[auto_1fr_auto] h-32 p-4">
-    <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Annual<br />Cash Flow
-    </div>
-    <div className="flex items-center justify-center">
-      <span
-        className={`text-2xl font-extrabold ${
-          annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
-        }`}
-      >
-        {formatCurrency(annualCashFlow)}
-      </span>
-    </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      Per Year
-    </div>
-  </div>
+            {/* Cash-on-Cash ROI */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
+              <div>
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  Cash-On-Cash<br />ROI
+                </div>
+                <div className="mt-2 text-2xl font-extrabold text-slate-800">
+                  {formatPercent(cashOnCashROI)}
+                </div>
+              </div>
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                On Initial Cash
+              </div>
+            </div>
 
-  {/* Cash-on-Cash ROI */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center grid grid-rows-[auto_1fr_auto] h-32 p-4">
-    <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Cash-On-Cash<br />ROI
-    </div>
-    <div className="flex items-center justify-center">
-      <span className="text-2xl font-extrabold text-slate-800">
-        {formatPercent(cashOnCashROI)}
-      </span>
-    </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      On Initial Cash
-    </div>
-  </div>
+            {/* Cap Rate */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
+              <div>
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  Cap<br />Rate
+                </div>
+                <div className="mt-2 text-2xl font-extrabold text-slate-800">
+                  {formatPercent(capRate)}
+                </div>
+              </div>
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                On Purchase Price
+              </div>
+            </div>
 
-  {/* Cap Rate */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center grid grid-rows-[auto_1fr_auto] h-32 p-4">
-    <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Cap<br />Rate
-    </div>
-    <div className="flex items-center justify-center">
-      <span className="text-2xl font-extrabold text-slate-800">
-        {formatPercent(capRate)}
-      </span>
-    </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      On Purchase Price
-    </div>
-  </div>
+            {/* DSCR – value + label tight */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
+              <div>
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  Debt Service<br />Coverage
+                </div>
+                <div className="mt-2 flex flex-col items-center leading-tight">
+                  <div className="text-2xl font-extrabold text-slate-800">
+                    {formatNumber(dscr)}
+                  </div>
+                  <div className="text-[0.6rem] text-slate-400 uppercase tracking-wide mt-0.5">
+                    {dscrText}
+                  </div>
+                </div>
+              </div>
+              <div className="pb-1" />
+            </div>
+          </div>
 
-{/* DSCR – tighter label spacing */}
-<div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
-  <div className="flex flex-col">
-    {/* Two-line header so it matches the others vertically */}
-    <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Debt Service<br />Coverage
-    </div>
-
-    {/* Value + status kept in a single mini-stack */}
-    <div className="mt-2 flex flex-col items-center leading-tight">
-      <div className="text-2xl font-extrabold text-slate-800">
-        {formatNumber(dscr)}
-      </div>
-      <div className="text-[0.6rem] text-slate-400 uppercase tracking-wide mt-0.5">
-        {dscrText}
-      </div>
-    </div>
-  </div>
-
-  {/* tiny spacer to keep overall height consistent with other cards */}
-  <div className="pb-1" />
-</div>
           {/* Pro Forma Annual Financials */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
