@@ -9,25 +9,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Print-specific KPI sizing + layout -->
-    <style>
+   <style>
   @media print {
-    /* KPI value (middle number) */
-    .kpi-value {
-      font-size: 13pt !important;   /* slightly smaller to keep big $ values inside */
+    /* KPI title (top text) */
+    .kpi-title,
+    .kpi-title-long {
+      font-size: 7pt !important;      /* Unified header size */
+      letter-spacing: 0.12em !important;
       line-height: 1.1 !important;
     }
 
-    /* KPI title (top text) */
-    .kpi-title {
-      font-size: 7pt !important;
-      letter-spacing: 0.12em !important;
-    }
-
-    /* Longer KPI title (Cash-on-Cash ROI) */
-    .kpi-title-long {
-      font-size: 6pt !important;          /* a bit smaller so it stays inside the box */
-      letter-spacing: 0.10em !important;
-      line-height: 1.05 !important;
+    /* KPI value (large number) */
+    .kpi-value {
+      font-size: 13pt !important;
+      line-height: 1.1 !important;
     }
 
     /* KPI bottom label */
@@ -37,7 +32,7 @@
       margin-top: 2px !important;
     }
 
-    /* KPI box height control */
+    /* KPI box */
     .kpi-box {
       height: 90px !important;
       padding-top: 6px !important;
