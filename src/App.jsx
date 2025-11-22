@@ -883,7 +883,7 @@ ${unitMixDetails}
     </div>
 
     <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      On Purchase Price
+      On Price
     </div>
   </div>
 
