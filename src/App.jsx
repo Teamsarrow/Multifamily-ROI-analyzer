@@ -1128,7 +1128,7 @@ ${unitMixDetails}
   *All calculations are estimates only and are not guaranteed. Buyer and investor to verify all figures independently.
 </div>
 
-</div>  {/* <-- This closes the outermost container */}
+</div>
 );
 };
 
