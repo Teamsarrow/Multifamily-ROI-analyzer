@@ -864,10 +864,9 @@ ${unitMixDetails}
 <div className="kpi-box kpi-cashoncash bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
   
   <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-    Cash-on-cash
+    Cash-on<br />cash
   </div>
 
-  {/* Value moved down to align with other KPI values */}
   <div className="kpi-value mt-3 font-extrabold text-slate-800">
     {formatPercent(cashOnCashROI)}
   </div>
