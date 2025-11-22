@@ -951,25 +951,28 @@ ${unitMixDetails}
     </div>
   </div>
 
-{/* DSCR */}
-<div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-center h-32">
-  <div className="flex flex-col items-center leading-tight">
-    <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 text-center">
+{/* DSCR – tighter label spacing */}
+<div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
+  <div className="flex flex-col">
+    {/* Two-line header so it matches the others vertically */}
+    <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
       Debt Service<br />Coverage
     </div>
 
-    {/* DSCR Value */}
-    <div className="mt-1 text-2xl font-extrabold text-slate-800">
-      {formatNumber(dscr)}
-    </div>
-
-    {/* Rating — tightened spacing */}
-    <div className="text-[0.6rem] text-slate-400 uppercase tracking-wide mt-0.5">
-      {dscrText}
+    {/* Value + status kept in a single mini-stack */}
+    <div className="mt-2 flex flex-col items-center leading-tight">
+      <div className="text-2xl font-extrabold text-slate-800">
+        {formatNumber(dscr)}
+      </div>
+      <div className="text-[0.6rem] text-slate-400 uppercase tracking-wide mt-0.5">
+        {dscrText}
+      </div>
     </div>
   </div>
-</div>
 
+  {/* tiny spacer to keep overall height consistent with other cards */}
+  <div className="pb-1" />
+</div>
           {/* Pro Forma Annual Financials */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
