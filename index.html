@@ -8,43 +8,49 @@
     <!-- Tailwind (for base styling on this shell page) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Print-specific KPI sizing + layout -->
-   <style>
-  @media print {
-    /* KPI title (top text) */
-    .kpi-title,
-    .kpi-title-long {
-      font-size: 7pt !important;      /* Unified header size */
-      letter-spacing: 0.12em !important;
-      line-height: 1.1 !important;
-    }
+    <style>
+      @media print {
+        /* Reduce logo size in PDF header only */
+        .print-logo {
+          height: 48px !important;
+          width: auto !important;
+        }
 
-    /* KPI value (large number) */
-    .kpi-value {
-      font-size: 13pt !important;
-      line-height: 1.1 !important;
-    }
+        /* KPI title (top text) */
+        .kpi-title,
+        .kpi-title-long {
+          font-size: 7pt !important;
+          letter-spacing: 0.12em !important;
+          line-height: 1.1 !important;
+        }
 
-    /* KPI bottom label */
-    .kpi-sub {
-      font-size: 7pt !important;
-      letter-spacing: 0.10em !important;
-      margin-top: 2px !important;
-    }
+        /* KPI value (large number) */
+        .kpi-value {
+          font-size: 13pt !important;
+          line-height: 1.1 !important;
+        }
 
-    /* KPI box */
-    .kpi-box {
-      height: 90px !important;
-      padding-top: 6px !important;
-      padding-bottom: 6px !important;
-      box-sizing: border-box !important;
-    }
-/* Nudge Cash-on-cash value closer to its title (PDF only) */
-.kpi-cashoncash .kpi-value {
-  margin-top: 2px !important;  /* try -2px; if still a hair off, you can use -3px */
-}
-  }
-</style>
+        /* KPI bottom label */
+        .kpi-sub {
+          font-size: 7pt !important;
+          letter-spacing: 0.10em !important;
+          margin-top: 2px !important;
+        }
+
+        /* KPI box */
+        .kpi-box {
+          height: 90px !important;
+          padding-top: 6px !important;
+          padding-bottom: 6px !important;
+          box-sizing: border-box !important;
+        }
+
+        /* Nudge Cash-on-Cash value */
+        .kpi-cashoncash .kpi-value {
+          margin-top: -2px !important;
+        }
+      }
+    </style>
   </head>
 
   <body class="bg-slate-50">
