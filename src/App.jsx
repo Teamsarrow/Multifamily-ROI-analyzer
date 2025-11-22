@@ -271,7 +271,7 @@ ${unitMixDetails}
             Draft your investment scenario and generate a shareable report or PDF.
           </p>
 <img
-  src="/JS Realtor logo initials"
+  src="/JS Realtor logo initials.png"
   alt="Logo"
   className="h-16 w-auto mt-3 print:h-20"
   />
