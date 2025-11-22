@@ -270,6 +270,11 @@ ${unitMixDetails}
           <p className="text-slate-500 mt-1">
             Draft your investment scenario and generate a shareable report or PDF.
           </p>
+<img
+  src="/JS SIHR Email signature.jpg"
+  alt="Logo"
+  className="h-16 w-auto mt-3 print:h-20"
+  />
         </div>
         <div className="flex flex-col sm:flex-row gap-2 mt-4 md:mt-0 items-center">
           {copySuccess && (
