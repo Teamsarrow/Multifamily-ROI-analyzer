@@ -868,14 +868,14 @@ ${unitMixDetails}
     </div>
 
     <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      On Initial Cash
+      Initial Cash
     </div>
   </div>
 
   {/* Cap Rate */}
   <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
     <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Cap<br />Rate
+      Cap Rate
     </div>
 
     <div className="kpi-value mt-1 font-extrabold text-slate-800">
