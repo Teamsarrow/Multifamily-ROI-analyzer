@@ -839,71 +839,66 @@ ${unitMixDetails}
 
         {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
         <div className="lg:col-span-7 space-y-6">
-          {/* KPI Strip */}
+{/* KPI Strip */}
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
   {/* Annual Cash Flow */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-between py-2">
+  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-24 flex flex-col justify-center print:h-20 print:py-1">
     <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Annual
-      <br />
-      Cash Flow
+      Annual<br />Cash Flow
     </div>
     <div
-      className={`text-2xl font-extrabold ${
+      className={`mt-1 text-2xl print:text-lg font-extrabold ${
         annualCashFlow >= 0 ? "text-green-700" : "text-red-700"
       }`}
     >
       {formatCurrency(annualCashFlow)}
     </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
+    <div className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
       Per Year
     </div>
   </div>
 
   {/* Cash-on-Cash ROI */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-between py-2">
+  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-24 flex flex-col justify-center print:h-20 print:py-1">
     <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Cash-on-Cash
-      <br />
-      ROI
+      Cash-on-Cash<br />ROI
     </div>
-    <div className="text-2xl font-extrabold text-slate-800">
+    <div className="mt-1 text-2xl print:text-lg font-extrabold text-slate-800">
       {formatPercent(cashOnCashROI)}
     </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
+    <div className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
       On Initial Cash
     </div>
   </div>
 
   {/* Cap Rate */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-between py-2">
+  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-24 flex flex-col justify-center print:h-20 print:py-1">
     <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Cap
-      <br />
-      Rate
+      Cap<br />Rate
     </div>
-    <div className="text-2xl font-extrabold text-slate-800">
+    <div className="mt-1 text-2xl print:text-lg font-extrabold text-slate-800">
       {formatPercent(capRate)}
     </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
+    <div className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
       On Purchase Price
     </div>
   </div>
 
   {/* DSCR */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-between py-2">
+  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-24 flex flex-col justify-center print:h-20 print:py-1">
     <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
       DSCR
     </div>
-    <div className="text-2xl font-extrabold text-slate-800">
+    <div className="mt-1 text-2xl print:text-lg font-extrabold text-slate-800">
       {formatNumber(dscr)}
     </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      {dscrStatus}
+    <div className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+      {dscrText}
     </div>
   </div>
-</div>          
-          {/* Pro Forma Annual Financials */}
+
+</div>          {/* Pro Forma Annual Financials */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
               <h3 className="font-semibold text-slate-800 flex items-center gap-2">
