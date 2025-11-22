@@ -270,7 +270,7 @@ ${unitMixDetails}
               className="h-16 w-auto"
             />
             <div>
-              <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
+              <div className="text-[0.8rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
                 Multifamily Investment Analysis
               </div>
               <div className="text-xs text-slate-500 mt-1">
@@ -702,50 +702,52 @@ ${unitMixDetails}
 
         {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
         <div className="lg:col-span-7 space-y-6">
-          {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Annual Cash Flow
-              </div>
-              <div
-                className={`mt-2 text-2xl font-extrabold ${
-                  annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
-                }`}
-              >
-                {formatCurrency(annualCashFlow)}
-              </div>
-            </div>
+  {/* Annual Cash Flow */}
+  <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
+    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+      Annual Cash Flow
+    </div>
+    <div
+      className={`mt-2 text-2xl font-extrabold ${
+        annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
+      }`}
+    >
+      {formatCurrency(annualCashFlow)}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Cash-on-Cash ROI
-              </div>
-              <div className="mt-2 text-2xl font-extrabold text-slate-800">
-                {formatPercent(cashOnCashROI)}
-              </div>
-            </div>
+  {/* Cash-on-Cash ROI */}
+  <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
+    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+      Cash-on-Cash ROI
+    </div>
+    <div className="mt-2 text-2xl font-extrabold text-slate-800">
+      {formatPercent(cashOnCashROI)}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Cap Rate
-              </div>
-              <div className="mt-2 text-2xl font-extrabold text-slate-800">
-                {formatPercent(capRate)}
-              </div>
-            </div>
+  {/* Cap Rate */}
+  <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
+    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+      Cap Rate
+    </div>
+    <div className="mt-2 text-2xl font-extrabold text-slate-800">
+      {formatPercent(capRate)}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
-              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                DSCR
-              </div>
-              <div className="mt-2 text-2xl font-extrabold text-slate-800">
-                {formatNumber(dscr)}
-              </div>
-              <div className="text-[0.7rem] text-slate-500 mt-1">{dscrText}</div>
-            </div>
-          </div>
-
+  {/* DSCR */}
+  <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
+    <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+      DSCR
+    </div>
+    <div className="mt-2 text-2xl font-extrabold text-slate-800">
+      {formatNumber(dscr)}
+    </div>
+    <div className="text-[0.7rem] text-slate-500 mt-1">{dscrText}</div>
+  </div>
+</div>
           {/* Pro Forma Annual Financials */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
