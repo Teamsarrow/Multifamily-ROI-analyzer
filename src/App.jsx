@@ -471,11 +471,11 @@ ${unitMixDetails}
         <div className="flex justify-between items-center gap-4">
           <div className="flex items-center gap-4">
             <img
-              src="/JS-contact-logo.png"
-              alt="Jonathan Sarrow Contact Logo"
-              className="h-18 w-auto"
-              style={{ objectFit: "contain" }}
-            />
+  src="/JS-contact-logo.png"
+  alt="Jonathan Sarrow Contact Logo"
+  className="h-18 w-auto print-logo"
+  style={{ objectFit: "contain" }}
+/>
           </div>
           <div className="text-right">
             <div className="text-[0.65rem] uppercase tracking-[0.16em] text-slate-500">
