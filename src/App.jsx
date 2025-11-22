@@ -382,13 +382,12 @@ ${unitMixDetails}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           {/* Left: Logo + analysis label */}
           <div className="flex items-center gap-4">
-            <img
-  src="/JS-contact-logo.png"
+<img
+  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABJsAAAHQCAYAAAAGUGsVAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAAXNSR0IArs4c6QAAIABJREFU......FULL STRING......"
   alt="Jonathan Sarrow Contact Logo"
   className="h-24 w-auto"
   style={{ objectFit: "contain" }}
-/>
-            <div>
+/>            <div>
               <div className="text-[0.8rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
                 Multifamily Investment Analysis
               </div>
