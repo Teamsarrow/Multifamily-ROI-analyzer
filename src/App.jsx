@@ -951,21 +951,21 @@ ${unitMixDetails}
     </div>
   </div>
 
-  {/* DSCR */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center grid grid-rows-[auto_1fr_auto] h-32 p-4">
+  {/* DSCR — aligned like other KPIs */}
+<div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
+  <div className="flex flex-col">
     <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
       DSCR
     </div>
-    <div className="flex items-center justify-center">
-      <span className="text-2xl font-extrabold text-slate-800">
-        {formatNumber(dscr)}
-      </span>
-    </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      {dscrText}
+    <div className="mt-2 text-2xl font-extrabold text-slate-800">
+      {formatNumber(dscr)}
     </div>
   </div>
- </div>
+  <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
+    {dscrText}
+  </div>
+</div>
+</div>
 
           {/* Pro Forma Annual Financials */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
