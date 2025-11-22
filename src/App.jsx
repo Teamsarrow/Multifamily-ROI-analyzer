@@ -963,8 +963,6 @@ ${unitMixDetails}
   </div>
   <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
     {dscrText}
-  </div>
-</div>
 </div>
 
           {/* Pro Forma Annual Financials */}
