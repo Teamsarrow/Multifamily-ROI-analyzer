@@ -861,8 +861,9 @@ ${unitMixDetails}
 
   {/* Cash-on-Cash ROI */}
   <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-24 print:h-20 flex flex-col items-center justify-center">
-    <div className="text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-slate-500 leading-tight">
-      Cash-on-Cash<br />ROI
+      <div className="text-[0.6rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight kpi-title kpi-title-long">
+    Cash-on-Cash<br />ROI
+  </div>
     </div>
     <div className="mt-1 text-xl print:text-[15pt] font-extrabold text-slate-800">
       {formatPercent(cashOnCashROI)}
