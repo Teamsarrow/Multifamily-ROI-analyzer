@@ -10,6 +10,11 @@
 
     <style>
       @media print {
+       /* Remove top padding from the main container on PDF */
+.print-remove-top-padding {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
         @page {
   margin-top: 0.5in !important;
   margin-left: 0.5in;
