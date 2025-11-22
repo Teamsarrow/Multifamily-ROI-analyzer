@@ -841,64 +841,61 @@ ${unitMixDetails}
         <div className="lg:col-span-7 space-y-6">
 {/* KPI Strip */}
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
   {/* Annual Cash Flow */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-24 print:h-20 flex flex-col items-center justify-center">
-    <div className="text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-slate-500 leading-tight">
+  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-between py-2 kpi-box overflow-hidden">
+    <div className="kpi-title text-[0.6rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
       Annual<br />Cash Flow
     </div>
     <div
-      className={`mt-1 text-xl print:text-[15pt] font-extrabold ${
-        annualCashFlow >= 0 ? "text-emerald-700" : "text-rose-700"
+      className={`kpi-value mt-1 text-xl md:text-2xl print:text-base font-extrabold ${
+        annualCashFlow >= 0 ? "text-green-700" : "text-red-700"
       }`}
     >
       {formatCurrency(annualCashFlow)}
     </div>
-    <div className="mt-0.5 text-[0.55rem] text-slate-400 uppercase tracking-wide">
+    <div className="kpi-sub mt-1 text-[0.6rem] text-slate-400 uppercase tracking-wide">
       Per Year
     </div>
   </div>
 
   {/* Cash-on-Cash ROI */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-24 print:h-20 flex flex-col items-center justify-center">
-      <div className="text-[0.6rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight kpi-title kpi-title-long">
-    Cash-on-Cash<br />ROI
-  </div>
+  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-between py-2 kpi-box overflow-hidden">
+    <div className="kpi-title kpi-title-long text-[0.6rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+      Cash-on-Cash<br />ROI
     </div>
-    <div className="mt-1 text-xl print:text-[15pt] font-extrabold text-slate-800">
+    <div className="kpi-value mt-1 text-xl md:text-2xl print:text-base font-extrabold text-slate-800">
       {formatPercent(cashOnCashROI)}
     </div>
-    <div className="mt-0.5 text-[0.55rem] text-slate-400 uppercase tracking-wide">
+    <div className="kpi-sub mt-1 text-[0.6rem] text-slate-400 uppercase tracking-wide">
       On Initial Cash
     </div>
   </div>
 
   {/* Cap Rate */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-24 print:h-20 flex flex-col items-center justify-center">
-    <div className="text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-slate-500 leading-tight">
+  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-between py-2 kpi-box overflow-hidden">
+    <div className="kpi-title text-[0.6rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
       Cap<br />Rate
     </div>
-    <div className="mt-1 text-xl print:text-[15pt] font-extrabold text-slate-800">
+    <div className="kpi-value mt-1 text-xl md:text-2xl print:text-base font-extrabold text-slate-800">
       {formatPercent(capRate)}
     </div>
-    <div className="mt-0.5 text-[0.55rem] text-slate-400 uppercase tracking-wide">
+    <div className="kpi-sub mt-1 text-[0.6rem] text-slate-400 uppercase tracking-wide">
       On Purchase Price
     </div>
   </div>
 
   {/* DSCR */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-24 print:h-20 flex flex-col items-center justify-center">
-    <div className="text-[0.6rem] font-semibold tracking-[0.16em] uppercase text-slate-500 leading-tight">
+  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-between py-2 kpi-box overflow-hidden">
+    <div className="kpi-title text-[0.6rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
       DSCR
     </div>
-    <div className="mt-1 text-xl print:text-[15pt] font-extrabold text-slate-800">
+    <div className="kpi-value mt-1 text-xl md:text-2xl print:text-base font-extrabold text-slate-800">
       {formatNumber(dscr)}
     </div>
-    <div className="mt-0.5 text-[0.55rem] text-slate-400 uppercase tracking-wide">
-      {dscrStatus}
+    <div className="kpi-sub mt-1 text-[0.6rem] text-slate-400 uppercase tracking-wide">
+      {dscrText}
     </div>
   </div>
-
 </div>         {/* Pro Forma Annual Financials */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
