@@ -11,13 +11,11 @@ import {
   Copy
 } from 'lucide-react';
 
+const SCENARIO_STORAGE_KEY = 'mf-roi-scenarios-v1';
+
 const App = () => {
   // --- State Management ---
   const [copySuccess, setCopySuccess] = useState('');
-
-  // Saved scenarios
-  const [scenarios, setScenarios] = useState([]);
-  const [selectedScenarioId, setSelectedScenarioId] = useState('');
 
   // Property Details
   const [address, setAddress] = useState('4-Unit Residential Property');
@@ -47,18 +45,19 @@ const App = () => {
   const [managementPercent, setManagementPercent] = useState(8);
   const [managementFlat, setManagementFlat] = useState(3000);
 
-  // Default unit mix
-  const defaultUnits = [
+  // Units
+  const [units, setUnits] = useState([
     { id: 1, beds: 2, baths: 1, rent: 1200 },
     { id: 2, beds: 2, baths: 1, rent: 1200 },
     { id: 3, beds: 1, baths: 1, rent: 950 },
     { id: 4, beds: 1, baths: 1, rent: 950 }
-  ];
+  ]);
 
-  // Units
-  const [units, setUnits] = useState(defaultUnits);
+  // Saved scenarios
+  const [scenarios, setScenarios] = useState([]);
+  const [selectedScenarioId, setSelectedScenarioId] = useState('');
 
-  // --- Formatting helpers ---
+  // --- Helpers: formatting ---
   const formatCurrency = (val) =>
     new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -153,116 +152,7 @@ const App = () => {
       ? 'Yellow (Borderline)'
       : 'Green (Strong)';
 
-  // --- Saved Scenarios: load & persist ---
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('mfScenariosV1');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setScenarios(parsed);
-        }
-      }
-    } catch (e) {
-      console.error('Failed to load scenarios', e);
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('mfScenariosV1', JSON.stringify(scenarios));
-    } catch (e) {
-      console.error('Failed to save scenarios', e);
-    }
-  }, [scenarios]);
-
-  const buildScenarioPayload = () => ({
-    id: selectedScenarioId || `scn-${Date.now()}`,
-    name:
-      address && address.trim().length > 0
-        ? `${address} – Scenario`
-        : 'Investment Scenario',
-    address,
-    mlsNumber,
-    purchasePrice,
-    downPayment,
-    interestRate,
-    loanTerm,
-    closingCosts,
-    initialCapEx,
-    vacancyRate,
-    maintenanceAnnual,
-    otherExpenses,
-    propertyTaxRate,
-    insuranceAnnual,
-    managementType,
-    managementPercent,
-    managementFlat,
-    units
-  });
-
-  const applyScenario = (s) => {
-    if (!s) return;
-    setAddress(s.address || '');
-    setMlsNumber(s.mlsNumber || '');
-    setPurchasePrice(s.purchasePrice || 0);
-    setDownPayment(s.downPayment || 0);
-    setInterestRate(s.interestRate || 0);
-    setLoanTerm(s.loanTerm || 0);
-    setClosingCosts(s.closingCosts || 0);
-    setInitialCapEx(s.initialCapEx || 0);
-    setVacancyRate(s.vacancyRate || 0);
-    setMaintenanceAnnual(s.maintenanceAnnual || 0);
-    setOtherExpenses(s.otherExpenses || 0);
-    setPropertyTaxRate(s.propertyTaxRate || 0);
-    setInsuranceAnnual(s.insuranceAnnual || 0);
-    setManagementType(s.managementType || 'percent');
-    setManagementPercent(s.managementPercent || 0);
-    setManagementFlat(s.managementFlat || 0);
-    setUnits(s.units && s.units.length ? s.units : defaultUnits);
-  };
-
-  const handleScenarioChange = (e) => {
-    const id = e.target.value;
-    setSelectedScenarioId(id);
-    const found = scenarios.find((scn) => scn.id === id);
-    if (found) applyScenario(found);
-  };
-
-  const handleSaveAsNew = () => {
-    const baseName = address || 'Investment Property';
-    const defaultName = `${baseName} – Scenario ${scenarios.length + 1}`;
-    const name = window.prompt('Scenario name:', defaultName);
-    if (!name) return;
-    const payload = buildScenarioPayload();
-    payload.id = `scn-${Date.now()}`;
-    payload.name = name;
-    setScenarios([...scenarios, payload]);
-    setSelectedScenarioId(payload.id);
-  };
-
-  const handleSaveScenario = () => {
-    if (!selectedScenarioId) {
-      handleSaveAsNew();
-      return;
-    }
-    const payload = buildScenarioPayload();
-    payload.id = selectedScenarioId;
-    const updated = scenarios.map((scn) =>
-      scn.id === selectedScenarioId ? { ...scn, ...payload } : scn
-    );
-    setScenarios(updated);
-  };
-
-  const handleDeleteScenario = () => {
-    if (!selectedScenarioId) return;
-    if (!window.confirm('Delete this scenario?')) return;
-    setScenarios(scenarios.filter((scn) => scn.id !== selectedScenarioId));
-    setSelectedScenarioId('');
-  };
-
-  // --- Handlers ---
+  // --- Unit handlers ---
 
   const addUnit = () => {
     const newId =
@@ -277,6 +167,8 @@ const App = () => {
   const updateUnit = (id, field, value) => {
     setUnits(units.map((u) => (u.id === id ? { ...u, [field]: value } : u)));
   };
+
+  // --- Printing & report ---
 
   const handlePrint = () => {
     window.print(); // User chooses "Save as PDF"
@@ -373,21 +265,133 @@ ${unitMixDetails}
     setTimeout(() => setCopySuccess(''), 4000);
   };
 
-  // --- JSX ---
+  // --- Scenario helpers ---
+
+  const buildScenarioData = () => ({
+    address,
+    mlsNumber,
+    purchasePrice,
+    downPayment,
+    interestRate,
+    loanTerm,
+    closingCosts,
+    initialCapEx,
+    vacancyRate,
+    maintenanceAnnual,
+    otherExpenses,
+    propertyTaxRate,
+    insuranceAnnual,
+    managementType,
+    managementPercent,
+    managementFlat,
+    units
+  });
+
+  const loadScenarioData = (data) => {
+    if (!data) return;
+    setAddress(data.address || '');
+    setMlsNumber(data.mlsNumber || '');
+    setPurchasePrice(data.purchasePrice || 0);
+    setDownPayment(data.downPayment || 0);
+    setInterestRate(data.interestRate || 0);
+    setLoanTerm(data.loanTerm || 0);
+    setClosingCosts(data.closingCosts || 0);
+    setInitialCapEx(data.initialCapEx || 0);
+    setVacancyRate(data.vacancyRate || 0);
+    setMaintenanceAnnual(data.maintenanceAnnual || 0);
+    setOtherExpenses(data.otherExpenses || 0);
+    setPropertyTaxRate(data.propertyTaxRate || 0);
+    setInsuranceAnnual(data.insuranceAnnual || 0);
+    setManagementType(data.managementType || 'percent');
+    setManagementPercent(data.managementPercent || 0);
+    setManagementFlat(data.managementFlat || 0);
+    setUnits(data.units && data.units.length ? data.units : []);
+  };
+
+  // Load scenarios from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(SCENARIO_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setScenarios(parsed);
+      }
+    } catch (e) {
+      console.error('Failed to load scenarios', e);
+    }
+  }, []);
+
+  // Save scenarios to localStorage
+  const persistScenarios = (list) => {
+    setScenarios(list);
+    try {
+      localStorage.setItem(SCENARIO_STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.error('Failed to save scenarios', e);
+    }
+  };
+
+  const handleSaveScenario = () => {
+    if (!selectedScenarioId) {
+      // If nothing selected, behave like "save as new"
+      handleSaveAsNew();
+      return;
+    }
+    const updated = scenarios.map((s) =>
+      s.id === selectedScenarioId ? { ...s, data: buildScenarioData() } : s
+    );
+    persistScenarios(updated);
+    setCopySuccess('Scenario saved.');
+    setTimeout(() => setCopySuccess(''), 3000);
+  };
+
+  const handleSaveAsNew = () => {
+    const baseName = address || 'Scenario';
+    const count =
+      scenarios.filter((s) => s.name.startsWith(baseName)).length + 1;
+    const newScenario = {
+      id: Date.now().toString(),
+      name: `${baseName} – Scenario ${count}`,
+      data: buildScenarioData()
+    };
+    const updated = [...scenarios, newScenario];
+    persistScenarios(updated);
+    setSelectedScenarioId(newScenario.id);
+    setCopySuccess('Scenario saved as new.');
+    setTimeout(() => setCopySuccess(''), 3000);
+  };
+
+  const handleDeleteScenario = () => {
+    if (!selectedScenarioId) return;
+    const updated = scenarios.filter((s) => s.id !== selectedScenarioId);
+    persistScenarios(updated);
+    setSelectedScenarioId('');
+  };
+
+  const handleSelectScenario = (id) => {
+    setSelectedScenarioId(id);
+    const scenario = scenarios.find((s) => s.id === id);
+    if (scenario) {
+      loadScenarioData(scenario.data);
+    }
+  };
+
+  // --- UI ---
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-0 print:bg-white print:text-black">
-      {/* Header / Action Bar (onscreen) */}
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-4 print:bg-white">
+      {/* Header / Action Bar (screen) */}
       <div className="max-w-6xl mx-auto mb-4 print:hidden">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           {/* Left: Logo + analysis label */}
           <div className="flex items-center gap-4">
-<img
-  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABJsAAAHQCAYAAAAGUGsVAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAAXNSR0IArs4c6QAAIABJREFU......FULL STRING......"
-  alt="Jonathan Sarrow Contact Logo"
-  className="h-24 w-auto"
-  style={{ objectFit: "contain" }}
-/>            <div>
+            <img
+              src="/JS-contact-logo.png"
+              alt="Jonathan Sarrow Logo"
+              className="h-16 w-auto"
+              style={{ objectFit: 'contain' }}
+            />
+            <div>
               <div className="text-[0.8rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
                 Multifamily Investment Analysis
               </div>
@@ -405,7 +409,7 @@ ${unitMixDetails}
             </div>
           </div>
 
-          {/* Right: buttons & status */}
+          {/* Right: buttons */}
           <div className="flex flex-col items-stretch md:items-end gap-2 w-full md:w-auto">
             {copySuccess && (
               <div className="bg-green-100 text-green-700 py-1 px-3 rounded-full text-xs flex items-center gap-2">
@@ -433,19 +437,20 @@ ${unitMixDetails}
           </div>
         </div>
 
-        {/* Thin divider under header */}
+        {/* Thin divider line under header */}
         <div className="border-b border-slate-200 mt-4" />
       </div>
 
-      {/* Printable Header (for PDF / printouts) */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 print:grid-cols-1 gap-6">       
+      {/* Printable Header (PDF / printouts) */}
+      <div className="hidden print:block max-w-6xl mx-auto mb-4 pb-3 border-b border-slate-300">
         <div className="flex justify-between items-center gap-4">
           {/* Left: logo + analysis label */}
           <div className="flex items-center gap-4">
             <img
-              src="/JS Realtor logo initials.png"
+              src="/JS-contact-logo.png"
               alt="Jonathan Sarrow Logo"
-              className="h-28 w-auto"
+              className="h-20 w-auto"
+              style={{ objectFit: 'contain' }}
             />
             <div>
               <div className="text-[0.7rem] font-semibold tracking-[0.18em] uppercase text-slate-700">
@@ -477,47 +482,44 @@ ${unitMixDetails}
         </div>
       </div>
 
-      {/* Saved scenarios bar (onscreen only) */}
+      {/* Saved scenarios bar (screen only) */}
       <div className="max-w-6xl mx-auto mb-4 print:hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex-1">
-            <div className="text-[0.7rem] font-semibold tracking-[0.18em] uppercase text-slate-500 mb-1">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="uppercase tracking-[0.18em] text-slate-400">
               Saved Scenarios
-            </div>
+            </span>
             <select
               value={selectedScenarioId}
-              onChange={handleScenarioChange}
-              className="w-full md:w-80 border border-slate-300 rounded-md text-xs px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => handleSelectScenario(e.target.value)}
+              className="border border-slate-300 rounded-md px-2 py-1 text-xs bg-white"
             >
               <option value="">Select scenario...</option>
-              {scenarios.map((scn) => (
-                <option key={scn.id} value={scn.id}>
-                  {scn.name}
+              {scenarios.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
                 </option>
               ))}
             </select>
           </div>
-          <div className="flex gap-2">
+
+          <div className="flex gap-2 justify-end">
             <button
               onClick={handleSaveScenario}
-              className="px-3 py-1.5 text-[0.7rem] rounded-md border border-slate-300 bg-white hover:bg-slate-50"
+              className="px-3 py-1 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100"
             >
               Save
             </button>
             <button
               onClick={handleSaveAsNew}
-              className="px-3 py-1.5 text-[0.7rem] rounded-md border border-blue-500 text-blue-600 bg-white hover:bg-blue-50"
+              className="px-3 py-1 rounded-md border border-blue-500 text-blue-600 hover:bg-blue-50"
             >
               Save as New
             </button>
             <button
               onClick={handleDeleteScenario}
+              className="px-3 py-1 rounded-md border border-red-300 text-red-500 hover:bg-red-50 disabled:opacity-40"
               disabled={!selectedScenarioId}
-              className={`px-3 py-1.5 text-[0.7rem] rounded-md border ${
-                selectedScenarioId
-                  ? 'border-red-500 text-red-600 bg-white hover:bg-red-50'
-                  : 'border-slate-200 text-slate-300 bg-slate-50 cursor-not-allowed'
-              }`}
             >
               Delete
             </button>
@@ -868,60 +870,68 @@ ${unitMixDetails}
 
         {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
         <div className="lg:col-span-7 space-y-6">
-          {/* KPI Cards – aligned strip */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 print:grid-cols-4 gap-4 print:gap-3">
+          {/* KPI strip */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Annual Cash Flow */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
-              <div className="min-h-[1.5rem] text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
-                Annual Cash Flow
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
+              <div className="flex flex-col">
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  Annual Cash Flow
+                </div>
+                <div
+                  className={`mt-2 text-2xl font-extrabold ${
+                    annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
+                  }`}
+                >
+                  {formatCurrency(annualCashFlow)}
+                </div>
               </div>
-              <div
-                className={`text-2xl font-extrabold ${
-                  annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
-                }`}
-              >
-                {formatCurrency(annualCashFlow)}
-              </div>
-              <div className="min-h-[1rem] text-[0.65rem] text-slate-400 uppercase tracking-wide">
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide pb-1">
                 Per Year
               </div>
             </div>
 
             {/* Cash-on-Cash ROI */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
-              <div className="min-h-[1.5rem] text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
-                Cash-on-Cash ROI
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
+              <div className="flex flex-col">
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  Cash-on-Cash ROI
+                </div>
+                <div className="mt-2 text-2xl font-extrabold text-slate-800">
+                  {formatPercent(cashOnCashROI)}
+                </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-800">
-                {formatPercent(cashOnCashROI)}
-              </div>
-              <div className="min-h-[1rem] text-[0.65rem] text-slate-400 uppercase tracking-wide">
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide pb-1">
                 On Initial Cash
               </div>
             </div>
 
             {/* Cap Rate */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
-              <div className="min-h-[1.5rem] text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
-                Cap Rate
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
+              <div className="flex flex-col">
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  Cap Rate
+                </div>
+                <div className="mt-2 text-2xl font-extrabold text-slate-800">
+                  {formatPercent(capRate)}
+                </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-800">
-                {formatPercent(capRate)}
-              </div>
-              <div className="min-h-[1rem] text-[0.65rem] text-slate-400 uppercase tracking-wide">
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide pb-1">
                 On Purchase Price
               </div>
             </div>
 
             {/* DSCR */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
-              <div className="min-h-[1.5rem] text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
-                DSCR
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
+              <div className="flex flex-col">
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  DSCR
+                </div>
+                <div className="mt-2 text-2xl font-extrabold text-slate-800">
+                  {formatNumber(dscr)}
+                </div>
               </div>
-              <div className="text-2xl font-extrabold text-slate-800">
-                {formatNumber(dscr)}
-              </div>
-              <div className="min-h-[1rem] text-[0.65rem] text-slate-400 uppercase tracking-wide">
+              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide pb-1">
                 {dscrText}
               </div>
             </div>
@@ -1049,7 +1059,7 @@ ${unitMixDetails}
           {/* Unit Mix */}
           <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-              <h3 className="font-semibold text-slate-800 flex items<center gap-2">
+              <h3 className="font-semibold text-slate-800 flex items-center gap-2">
                 <Home size={18} />
                 Unit Mix Breakdown
               </h3>
@@ -1068,7 +1078,7 @@ ${unitMixDetails}
                       <th className="p-3">Bedrooms</th>
                       <th className="p-3">Bathrooms</th>
                       <th className="p-3">Monthly Rent</th>
-                      <th className="p-3 rounded-r-lg print-hidden">Actions</th>
+                      <th className="p-3 rounded-r-lg print:hidden">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -1124,7 +1134,7 @@ ${unitMixDetails}
                             />
                           </div>
                         </td>
-                        <td className="p-3 print-hidden">
+                        <td className="p-3 print:hidden">
                           <button
                             onClick={() => removeUnit(unit.id)}
                             className="text-slate-400 hover:text-red-500 transition-colors"
@@ -1139,7 +1149,7 @@ ${unitMixDetails}
                 </table>
               </div>
 
-              <div className="mt-4 px-4 md:px-0 print-hidden">
+              <div className="mt-4 px-4 md:px-0 print:hidden">
                 <button
                   onClick={addUnit}
                   className="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
@@ -1153,8 +1163,7 @@ ${unitMixDetails}
         </div>
       </div>
 
-      {/* FOOTER – CBRE / JLL style */}
-      {/* Footer with contact info + logo (screen & print) */}
+      {/* Footer with contact info & logo */}
       <div className="max-w-6xl mx-auto mt-8 mb-4 border-t border-slate-200 pt-4 flex flex-col sm:flex-row items-start justify-between gap-4 text-xs text-slate-500 print:text-[10px]">
         <div>
           <div className="font-semibold text-slate-700 text-sm">
@@ -1170,18 +1179,18 @@ ${unitMixDetails}
 
         <div className="flex-shrink-0">
           <img
-  src="/JS-contact-logo.png"
-  alt="Jonathan Sarrow Contact Logo"
-  className="h-16 w-auto print:h-14"
-  style={{ objectFit: 'contain' }}
-/>
+            src="/JS-contact-logo.png"
+            alt="Jonathan Sarrow Contact Logo"
+            className="h-16 w-auto print:h-14"
+            style={{ objectFit: 'contain' }}
+          />
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto mb-6 text-center text-[0.65rem] text-slate-400 print:text-[8px]">
         <p>
-          Generated via Multifamily ROI Analyzer. For estimation purposes only and
-          not a substitute for professional financial advice.
+          Generated via Multifamily ROI Analyzer. For estimation purposes only
+          and not a substitute for professional financial advice.
         </p>
       </div>
     </div>
