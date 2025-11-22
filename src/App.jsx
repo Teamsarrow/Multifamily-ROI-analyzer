@@ -951,18 +951,22 @@ ${unitMixDetails}
     </div>
   </div>
 
- {/* DSCR */}
-<div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
-  <div className="flex flex-col">
-    <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+{/* DSCR */}
+<div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-center h-32">
+  <div className="flex flex-col items-center leading-tight">
+    <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 text-center">
       Debt Service<br />Coverage
     </div>
-    <div className="mt-2 text-2xl font-extrabold text-slate-800">
+
+    {/* DSCR Value */}
+    <div className="mt-1 text-2xl font-extrabold text-slate-800">
       {formatNumber(dscr)}
     </div>
-  </div>
-  <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-    {dscrText}
+
+    {/* Rating — tightened spacing */}
+    <div className="text-[0.6rem] text-slate-400 uppercase tracking-wide mt-0.5">
+      {dscrText}
+    </div>
   </div>
 </div>
 
