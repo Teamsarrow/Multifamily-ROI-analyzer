@@ -267,7 +267,7 @@ ${unitMixDetails}
             <img
               src="/JS Realtor logo initials.png"
               alt="Jonathan Sarrow Logo"
-              className="h-16 w-auto"
+              className="h-20 w-auto"
             />
             <div>
               <div className="text-[0.8rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
