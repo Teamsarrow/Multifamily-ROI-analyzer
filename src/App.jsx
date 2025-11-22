@@ -837,18 +837,18 @@ ${unitMixDetails}
           </section>
         </div>
 
-        {/* RIGHT COLUMN: KPI + OUTPUT + UNIT MIX */}
-        <div className="lg:col-span-7 space-y-4">
+        {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
+        <div className="lg:col-span-7 space-y-6">
           {/* KPI Strip */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Annual Cash Flow */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
-              <div className="text-[0.65rem] font-semibold tracking-[0.16em] uppercase text-slate-500">
-                Annual Cash Flow
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
+              <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                Annual<br />Cash Flow
               </div>
               <div
                 className={`mt-1 text-2xl font-extrabold ${
-                  annualCashFlow >= 0 ? "text-green-700" : "text-red-700"
+                  annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
                 }`}
               >
                 {formatCurrency(annualCashFlow)}
@@ -859,9 +859,9 @@ ${unitMixDetails}
             </div>
 
             {/* Cash-on-Cash ROI */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
-              <div className="text-[0.65rem] font-semibold tracking-[0.16em] uppercase text-slate-500">
-                Cash-On-Cash ROI
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
+              <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                Cash-on-Cash<br />ROI
               </div>
               <div className="mt-1 text-2xl font-extrabold text-slate-800">
                 {formatPercent(cashOnCashROI)}
@@ -872,9 +872,9 @@ ${unitMixDetails}
             </div>
 
             {/* Cap Rate */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
-              <div className="text-[0.65rem] font-semibold tracking-[0.16em] uppercase text-slate-500">
-                Cap Rate
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
+              <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                Cap<br />Rate
               </div>
               <div className="mt-1 text-2xl font-extrabold text-slate-800">
                 {formatPercent(capRate)}
@@ -885,19 +885,18 @@ ${unitMixDetails}
             </div>
 
             {/* DSCR */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
-              <div className="text-[0.65rem] font-semibold tracking-[0.16em] uppercase text-slate-500">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
+              <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
                 DSCR
               </div>
               <div className="mt-1 text-2xl font-extrabold text-slate-800">
                 {formatNumber(dscr)}
               </div>
               <div className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
-                {dscrStatus}
+                {dscrText}
               </div>
             </div>
           </div>
-
           {/* Pro Forma Annual Financials */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
