@@ -384,7 +384,6 @@ ${unitMixDetails}
           <div className="flex items-center gap-4">
             <img
               src="/JS Realtor logo initials.png"
-              alt="Jonathan Sarrow Logo"
               className="h-20 w-auto"
             />
             <div>
