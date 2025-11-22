@@ -11,7 +11,33 @@ import {
   Copy
 } from 'lucide-react';
 
-const SCENARIO_STORAGE_KEY = 'mf-roi-scenarios-v1';
+/**
+ * Simple reusable KPI card, so all four KPIs line up perfectly.
+ */
+const KpiCard = ({ line1, line2, value, valueClass = '', bottom }) => (
+  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
+    <div className="mt-1">
+      <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+        {line1}
+        <br />
+        {line2}
+      </div>
+      <div className={`mt-1 text-2xl font-extrabold ${valueClass || 'text-slate-800'}`}>
+        {value}
+      </div>
+    </div>
+    <div className="mb-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+      {bottom}
+    </div>
+  </div>
+);
+
+const defaultUnits = [
+  { id: 1, beds: 2, baths: 1, rent: 1200 },
+  { id: 2, beds: 2, baths: 1, rent: 1200 },
+  { id: 3, beds: 1, baths: 1, rent: 950 },
+  { id: 4, beds: 1, baths: 1, rent: 950 }
+];
 
 const App = () => {
   // --- State Management ---
@@ -46,18 +72,33 @@ const App = () => {
   const [managementFlat, setManagementFlat] = useState(3000);
 
   // Units
-  const [units, setUnits] = useState([
-    { id: 1, beds: 2, baths: 1, rent: 1200 },
-    { id: 2, beds: 2, baths: 1, rent: 1200 },
-    { id: 3, beds: 1, baths: 1, rent: 950 },
-    { id: 4, beds: 1, baths: 1, rent: 950 }
-  ]);
+  const [units, setUnits] = useState(defaultUnits);
 
   // Saved scenarios
   const [scenarios, setScenarios] = useState([]);
-  const [selectedScenarioId, setSelectedScenarioId] = useState('');
+  const [selectedScenarioId, setSelectedScenarioId] = useState(null);
 
-  // --- Helpers: formatting ---
+  // --- Load / persist scenarios to localStorage ---
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem('mf_roi_scenarios');
+      if (stored) {
+        setScenarios(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Error loading scenarios from localStorage', e);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('mf_roi_scenarios', JSON.stringify(scenarios));
+    } catch (e) {
+      console.error('Error saving scenarios to localStorage', e);
+    }
+  }, [scenarios]);
+
+  // Formatting helpers
   const formatCurrency = (val) =>
     new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -152,7 +193,101 @@ const App = () => {
       ? 'Yellow (Borderline)'
       : 'Green (Strong)';
 
-  // --- Unit handlers ---
+  // --- Scenario helpers ---
+
+  const buildScenarioPayload = () => ({
+    address,
+    mlsNumber,
+    purchasePrice,
+    downPayment,
+    interestRate,
+    loanTerm,
+    closingCosts,
+    initialCapEx,
+    vacancyRate,
+    maintenanceAnnual,
+    otherExpenses,
+    propertyTaxRate,
+    insuranceAnnual,
+    managementType,
+    managementPercent,
+    managementFlat,
+    units
+  });
+
+  const loadScenarioPayload = (data) => {
+    if (!data) return;
+    setAddress(data.address ?? '');
+    setMlsNumber(data.mlsNumber ?? '');
+    setPurchasePrice(data.purchasePrice ?? 0);
+    setDownPayment(data.downPayment ?? 0);
+    setInterestRate(data.interestRate ?? 0);
+    setLoanTerm(data.loanTerm ?? 0);
+    setClosingCosts(data.closingCosts ?? 0);
+    setInitialCapEx(data.initialCapEx ?? 0);
+    setVacancyRate(data.vacancyRate ?? 0);
+    setMaintenanceAnnual(data.maintenanceAnnual ?? 0);
+    setOtherExpenses(data.otherExpenses ?? 0);
+    setPropertyTaxRate(data.propertyTaxRate ?? 0);
+    setInsuranceAnnual(data.insuranceAnnual ?? 0);
+    setManagementType(data.managementType ?? 'percent');
+    setManagementPercent(data.managementPercent ?? 0);
+    setManagementFlat(data.managementFlat ?? 0);
+    setUnits(data.units ?? defaultUnits);
+  };
+
+  const handleSaveScenario = () => {
+    const nameBase = address || 'Property';
+    if (!selectedScenarioId) {
+      // If nothing selected, treat as "Save as New"
+      handleSaveScenarioAsNew();
+      return;
+    }
+    setScenarios((prev) =>
+      prev.map((sc) =>
+        sc.id === selectedScenarioId
+          ? { ...sc, data: buildScenarioPayload() }
+          : sc
+      )
+    );
+  };
+
+  const handleSaveScenarioAsNew = () => {
+    const id = Date.now();
+    const nameBase = address || 'Property';
+    const name = `${nameBase} – Scenario ${scenarios.length + 1}`;
+    const newScenario = {
+      id,
+      name,
+      data: buildScenarioPayload()
+    };
+    setScenarios((prev) => [...prev, newScenario]);
+    setSelectedScenarioId(id);
+  };
+
+  const handleDeleteScenario = () => {
+    if (!selectedScenarioId) return;
+    setScenarios((prev) =>
+      prev.filter((sc) => sc.id !== selectedScenarioId)
+    );
+    setSelectedScenarioId(null);
+  };
+
+  const handleSelectScenario = (e) => {
+    const value = e.target.value;
+    if (!value) {
+      setSelectedScenarioId(null);
+      return;
+    }
+    const id = Number(value);
+    setSelectedScenarioId(id);
+    const scenario = scenarios.find((sc) => sc.id === id);
+    if (scenario) {
+      loadScenarioPayload(scenario.data);
+    }
+  };
+
+  // --- Other handlers ---
 
   const addUnit = () => {
     const newId =
@@ -167,8 +302,6 @@ const App = () => {
   const updateUnit = (id, field, value) => {
     setUnits(units.map((u) => (u.id === id ? { ...u, [field]: value } : u)));
   };
-
-  // --- Printing & report ---
 
   const handlePrint = () => {
     window.print(); // User chooses "Save as PDF"
@@ -265,131 +398,19 @@ ${unitMixDetails}
     setTimeout(() => setCopySuccess(''), 4000);
   };
 
-  // --- Scenario helpers ---
-
-  const buildScenarioData = () => ({
-    address,
-    mlsNumber,
-    purchasePrice,
-    downPayment,
-    interestRate,
-    loanTerm,
-    closingCosts,
-    initialCapEx,
-    vacancyRate,
-    maintenanceAnnual,
-    otherExpenses,
-    propertyTaxRate,
-    insuranceAnnual,
-    managementType,
-    managementPercent,
-    managementFlat,
-    units
-  });
-
-  const loadScenarioData = (data) => {
-    if (!data) return;
-    setAddress(data.address || '');
-    setMlsNumber(data.mlsNumber || '');
-    setPurchasePrice(data.purchasePrice || 0);
-    setDownPayment(data.downPayment || 0);
-    setInterestRate(data.interestRate || 0);
-    setLoanTerm(data.loanTerm || 0);
-    setClosingCosts(data.closingCosts || 0);
-    setInitialCapEx(data.initialCapEx || 0);
-    setVacancyRate(data.vacancyRate || 0);
-    setMaintenanceAnnual(data.maintenanceAnnual || 0);
-    setOtherExpenses(data.otherExpenses || 0);
-    setPropertyTaxRate(data.propertyTaxRate || 0);
-    setInsuranceAnnual(data.insuranceAnnual || 0);
-    setManagementType(data.managementType || 'percent');
-    setManagementPercent(data.managementPercent || 0);
-    setManagementFlat(data.managementFlat || 0);
-    setUnits(data.units && data.units.length ? data.units : []);
-  };
-
-  // Load scenarios from localStorage
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(SCENARIO_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setScenarios(parsed);
-      }
-    } catch (e) {
-      console.error('Failed to load scenarios', e);
-    }
-  }, []);
-
-  // Save scenarios to localStorage
-  const persistScenarios = (list) => {
-    setScenarios(list);
-    try {
-      localStorage.setItem(SCENARIO_STORAGE_KEY, JSON.stringify(list));
-    } catch (e) {
-      console.error('Failed to save scenarios', e);
-    }
-  };
-
-  const handleSaveScenario = () => {
-    if (!selectedScenarioId) {
-      // If nothing selected, behave like "save as new"
-      handleSaveAsNew();
-      return;
-    }
-    const updated = scenarios.map((s) =>
-      s.id === selectedScenarioId ? { ...s, data: buildScenarioData() } : s
-    );
-    persistScenarios(updated);
-    setCopySuccess('Scenario saved.');
-    setTimeout(() => setCopySuccess(''), 3000);
-  };
-
-  const handleSaveAsNew = () => {
-    const baseName = address || 'Scenario';
-    const count =
-      scenarios.filter((s) => s.name.startsWith(baseName)).length + 1;
-    const newScenario = {
-      id: Date.now().toString(),
-      name: `${baseName} – Scenario ${count}`,
-      data: buildScenarioData()
-    };
-    const updated = [...scenarios, newScenario];
-    persistScenarios(updated);
-    setSelectedScenarioId(newScenario.id);
-    setCopySuccess('Scenario saved as new.');
-    setTimeout(() => setCopySuccess(''), 3000);
-  };
-
-  const handleDeleteScenario = () => {
-    if (!selectedScenarioId) return;
-    const updated = scenarios.filter((s) => s.id !== selectedScenarioId);
-    persistScenarios(updated);
-    setSelectedScenarioId('');
-  };
-
-  const handleSelectScenario = (id) => {
-    setSelectedScenarioId(id);
-    const scenario = scenarios.find((s) => s.id === id);
-    if (scenario) {
-      loadScenarioData(scenario.data);
-    }
-  };
-
-  // --- UI ---
+  // --- JSX ---
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-4 print:bg-white">
-      {/* Header / Action Bar (screen) */}
+      {/* Header / Action Bar */}
       <div className="max-w-6xl mx-auto mb-4 print:hidden">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           {/* Left: Logo + analysis label */}
           <div className="flex items-center gap-4">
             <img
-              src="/JS-contact-logo.png"
+              src="/JS Realtor logo initials.png"
               alt="Jonathan Sarrow Logo"
-              className="h-16 w-auto"
-              style={{ objectFit: 'contain' }}
+              className="h-20 w-auto"
             />
             <div>
               <div className="text-[0.8rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
@@ -409,7 +430,7 @@ ${unitMixDetails}
             </div>
           </div>
 
-          {/* Right: buttons */}
+          {/* Right: buttons & status */}
           <div className="flex flex-col items-stretch md:items-end gap-2 w-full md:w-auto">
             {copySuccess && (
               <div className="bg-green-100 text-green-700 py-1 px-3 rounded-full text-xs flex items-center gap-2">
@@ -437,20 +458,19 @@ ${unitMixDetails}
           </div>
         </div>
 
-        {/* Thin divider line under header */}
+        {/* Thin divider line under header, CBRE-style */}
         <div className="border-b border-slate-200 mt-4" />
       </div>
 
-      {/* Printable Header (PDF / printouts) */}
-      <div className="hidden print:block max-w-6xl mx-auto mb-4 pb-3 border-b border-slate-300">
+      {/* Printable Header (for PDF / printouts) */}
+      <div className="hidden print:block max-w-6xl mx-auto mb-6 pb-3 border-b border-slate-300">
         <div className="flex justify-between items-center gap-4">
           {/* Left: logo + analysis label */}
           <div className="flex items-center gap-4">
             <img
-              src="/JS-contact-logo.png"
+              src="/JS Realtor logo initials.png"
               alt="Jonathan Sarrow Logo"
-              className="h-20 w-auto"
-              style={{ objectFit: 'contain' }}
+              className="h-28 w-auto"
             />
             <div>
               <div className="text-[0.7rem] font-semibold tracking-[0.18em] uppercase text-slate-700">
@@ -482,44 +502,47 @@ ${unitMixDetails}
         </div>
       </div>
 
-      {/* Saved scenarios bar (screen only) */}
+      {/* Saved Scenarios Bar (desktop only, not printed) */}
       <div className="max-w-6xl mx-auto mb-4 print:hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="uppercase tracking-[0.18em] text-slate-400">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="flex-1">
+            <label className="block text-[0.65rem] uppercase tracking-[0.18em] text-slate-500 mb-1">
               Saved Scenarios
-            </span>
+            </label>
             <select
-              value={selectedScenarioId}
-              onChange={(e) => handleSelectScenario(e.target.value)}
-              className="border border-slate-300 rounded-md px-2 py-1 text-xs bg-white"
+              value={selectedScenarioId || ''}
+              onChange={handleSelectScenario}
+              className="w-full md:w-80 border border-slate-300 rounded-md px-3 py-2 text-sm bg-white"
             >
               <option value="">Select scenario...</option>
-              {scenarios.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
+              {scenarios.map((sc) => (
+                <option key={sc.id} value={sc.id}>
+                  {sc.name}
                 </option>
               ))}
             </select>
           </div>
-
-          <div className="flex gap-2 justify-end">
+          <div className="flex gap-2">
             <button
               onClick={handleSaveScenario}
-              className="px-3 py-1 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-100"
+              className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white hover:bg-slate-50"
             >
               Save
             </button>
             <button
-              onClick={handleSaveAsNew}
-              className="px-3 py-1 rounded-md border border-blue-500 text-blue-600 hover:bg-blue-50"
+              onClick={handleSaveScenarioAsNew}
+              className="px-4 py-2 text-xs font-medium rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
             >
               Save as New
             </button>
             <button
               onClick={handleDeleteScenario}
-              className="px-3 py-1 rounded-md border border-red-300 text-red-500 hover:bg-red-50 disabled:opacity-40"
               disabled={!selectedScenarioId}
+              className={`px-4 py-2 text-xs font-medium rounded-lg border ${
+                selectedScenarioId
+                  ? 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100'
+                  : 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
             >
               Delete
             </button>
@@ -870,71 +893,33 @@ ${unitMixDetails}
 
         {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
         <div className="lg:col-span-7 space-y-6">
-          {/* KPI strip */}
+          {/* KPI Cards – using shared KpiCard so everything lines up */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Annual Cash Flow */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
-              <div className="flex flex-col">
-                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  Annual Cash Flow
-                </div>
-                <div
-                  className={`mt-2 text-2xl font-extrabold ${
-                    annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
-                  }`}
-                >
-                  {formatCurrency(annualCashFlow)}
-                </div>
-              </div>
-              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide pb-1">
-                Per Year
-              </div>
-            </div>
-
-            {/* Cash-on-Cash ROI */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
-              <div className="flex flex-col">
-                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  Cash-on-Cash ROI
-                </div>
-                <div className="mt-2 text-2xl font-extrabold text-slate-800">
-                  {formatPercent(cashOnCashROI)}
-                </div>
-              </div>
-              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide pb-1">
-                On Initial Cash
-              </div>
-            </div>
-
-            {/* Cap Rate */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
-              <div className="flex flex-col">
-                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  Cap Rate
-                </div>
-                <div className="mt-2 text-2xl font-extrabold text-slate-800">
-                  {formatPercent(capRate)}
-                </div>
-              </div>
-              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide pb-1">
-                On Purchase Price
-              </div>
-            </div>
-
-            {/* DSCR */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
-              <div className="flex flex-col">
-                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  DSCR
-                </div>
-                <div className="mt-2 text-2xl font-extrabold text-slate-800">
-                  {formatNumber(dscr)}
-                </div>
-              </div>
-              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide pb-1">
-                {dscrText}
-              </div>
-            </div>
+            <KpiCard
+              line1="Annual Cash"
+              line2="Flow"
+              value={formatCurrency(annualCashFlow)}
+              valueClass={annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'}
+              bottom="Per Year"
+            />
+            <KpiCard
+              line1="Cash-on-Cash"
+              line2="ROI"
+              value={formatPercent(cashOnCashROI)}
+              bottom="On Initial Cash"
+            />
+            <KpiCard
+              line1="Cap"
+              line2="Rate"
+              value={formatPercent(capRate)}
+              bottom="On Purchase Price"
+            />
+            <KpiCard
+              line1="Debt Service"
+              line2="Coverage"
+              value={formatNumber(dscr)}
+              bottom={dscrText.toUpperCase()}
+            />
           </div>
 
           {/* Pro Forma Annual Financials */}
@@ -1163,35 +1148,8 @@ ${unitMixDetails}
         </div>
       </div>
 
-      {/* Footer with contact info & logo */}
-      <div className="max-w-6xl mx-auto mt-8 mb-4 border-t border-slate-200 pt-4 flex flex-col sm:flex-row items-start justify-between gap-4 text-xs text-slate-500 print:text-[10px]">
-        <div>
-          <div className="font-semibold text-slate-700 text-sm">
-            Jonathan Sarrow, Realtor®
-          </div>
-          <div>Phone: 818-469-5309</div>
-          <div>Email: jonathan.sarrow@gmail.com</div>
-          <div className="text-[0.6rem] text-slate-400 mt-1 max-w-md">
-            Brokered by SHE IS HOPE Realty. Information deemed reliable but not
-            guaranteed. Buyer and lender to verify all figures independently.
-          </div>
-        </div>
-
-        <div className="flex-shrink-0">
-          <img
-            src="/JS-contact-logo.png"
-            alt="Jonathan Sarrow Contact Logo"
-            className="h-16 w-auto print:h-14"
-            style={{ objectFit: 'contain' }}
-          />
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto mb-6 text-center text-[0.65rem] text-slate-400 print:text-[8px]">
-        <p>
-          Generated via Multifamily ROI Analyzer. For estimation purposes only
-          and not a substitute for professional financial advice.
-        </p>
+      <div className="max-w-6xl mx-auto mt-8 text-center text-xs text-slate-400">
+        <p>Generated via Multifamily ROI Analyzer. For estimation purposes only.</p>
       </div>
     </div>
   );
