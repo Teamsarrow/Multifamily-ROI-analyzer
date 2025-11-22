@@ -841,14 +841,17 @@ ${unitMixDetails}
         <div className="lg:col-span-7 space-y-6">
 {/* KPI Strip */}
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
   {/* Annual Cash Flow */}
   <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
     <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
       Annual<br />Cash Flow
     </div>
 
-    <div className={`kpi-value mt-1 font-extrabold ${annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+    <div
+      className={`kpi-value mt-1 font-extrabold ${
+        annualCashFlow >= 0 ? "text-green-700" : "text-red-700"
+      }`}
+    >
       {formatCurrency(annualCashFlow)}
     </div>
 
@@ -857,13 +860,14 @@ ${unitMixDetails}
     </div>
   </div>
 
-  {/* Cash-on-Cash ROI */}
+  {/* Cash-on-cash ROI */}
   <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
-    <div className="kpi-title-long text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Cash-on-Cash
+    <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+      Cash-on-cash
     </div>
 
-    <div className="kpi-value mt-1 font-extrabold text-slate-800">
+    {/* Value moved down to align with other KPI values */}
+    <div className="kpi-value mt-3 font-extrabold text-slate-800">
       {formatPercent(cashOnCashROI)}
     </div>
 
@@ -872,21 +876,20 @@ ${unitMixDetails}
     </div>
   </div>
 
-  {/* Cash-on-Cash ROI */}
-<div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
-  <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-    Cash-on-cash
-  </div>
+  {/* Cap Rate */}
+  <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
+    <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+      Cap<br />Rate
+    </div>
 
-  {/* Value moved down to align with other KPI values */}
-  <div className="kpi-value mt-3 font-extrabold text-slate-800">
-    {formatPercent(cashOnCashROI)}
-  </div>
+    <div className="kpi-value mt-1 font-extrabold text-slate-800">
+      {formatPercent(capRate)}
+    </div>
 
-  <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
-    ROI
+    <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
+      On Price
+    </div>
   </div>
-</div>
 
   {/* DSCR */}
   <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
@@ -902,7 +905,6 @@ ${unitMixDetails}
       {dscrStatus}
     </div>
   </div>
-
 </div>       {/* Pro Forma Annual Financials */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
