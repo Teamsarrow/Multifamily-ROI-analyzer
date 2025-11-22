@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Calculator,
   Home,
@@ -8,44 +8,17 @@ import {
   Printer,
   TrendingUp,
   MapPin,
-  Copy
-} from 'lucide-react';
-
-/**
- * Simple reusable KPI card, so all four KPIs line up perfectly.
- */
-const KpiCard = ({ line1, line2, value, valueClass = '', bottom }) => (
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
-    <div className="mt-1">
-      <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-        {line1}
-        <br />
-        {line2}
-      </div>
-      <div className={`mt-1 text-2xl font-extrabold ${valueClass || 'text-slate-800'}`}>
-        {value}
-      </div>
-    </div>
-    <div className="mb-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      {bottom}
-    </div>
-  </div>
-);
-
-const defaultUnits = [
-  { id: 1, beds: 2, baths: 1, rent: 1200 },
-  { id: 2, beds: 2, baths: 1, rent: 1200 },
-  { id: 3, beds: 1, baths: 1, rent: 950 },
-  { id: 4, beds: 1, baths: 1, rent: 950 }
-];
+  Copy,
+} from "lucide-react";
 
 const App = () => {
   // --- State Management ---
-  const [copySuccess, setCopySuccess] = useState('');
+
+  const [copySuccess, setCopySuccess] = useState("");
 
   // Property Details
-  const [address, setAddress] = useState('4-Unit Residential Property');
-  const [mlsNumber, setMlsNumber] = useState('1234567');
+  const [address, setAddress] = useState("4-Unit Residential Property");
+  const [mlsNumber, setMlsNumber] = useState("1234567");
 
   // Property Basics & Loan
   const [purchasePrice, setPurchasePrice] = useState(500000);
@@ -67,71 +40,54 @@ const App = () => {
   const [insuranceAnnual, setInsuranceAnnual] = useState(1200);
 
   // Management Logic
-  const [managementType, setManagementType] = useState('percent'); // 'percent' or 'flat'
+  const [managementType, setManagementType] = useState("percent"); // 'percent' or 'flat'
   const [managementPercent, setManagementPercent] = useState(8);
   const [managementFlat, setManagementFlat] = useState(3000);
 
   // Units
-  const [units, setUnits] = useState(defaultUnits);
+  const [units, setUnits] = useState([
+    { id: 1, beds: 2, baths: 1, rent: 1200 },
+    { id: 2, beds: 2, baths: 1, rent: 1200 },
+    { id: 3, beds: 1, baths: 1, rent: 950 },
+    { id: 4, beds: 1, baths: 1, rent: 950 },
+  ]);
 
-  // Saved scenarios
-  const [scenarios, setScenarios] = useState([]);
-  const [selectedScenarioId, setSelectedScenarioId] = useState(null);
+  // Scenario saving
+  const [savedScenarios, setSavedScenarios] = useState([]);
+  const [selectedScenarioId, setSelectedScenarioId] = useState("");
 
-  // --- Load / persist scenarios to localStorage ---
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem('mf_roi_scenarios');
-      if (stored) {
-        setScenarios(JSON.parse(stored));
-      }
-    } catch (e) {
-      console.error('Error loading scenarios from localStorage', e);
-    }
-  }, []);
+  // --- Helpers ---
 
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('mf_roi_scenarios', JSON.stringify(scenarios));
-    } catch (e) {
-      console.error('Error saving scenarios to localStorage', e);
-    }
-  }, [scenarios]);
-
-  // Formatting helpers
   const formatCurrency = (val) =>
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
     }).format(val || 0);
 
   const formatPercent = (val) => `${(val || 0).toFixed(2)}%`;
 
   const formatNumber = (val) =>
-    (val || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+    (val || 0).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
   // --- Calculations ---
 
-  // Income
   const totalMonthlyRent = units.reduce(
     (acc, unit) => acc + (parseFloat(unit.rent) || 0),
     0
   );
-  const potentialGrossIncome = totalMonthlyRent * 12; // AGR / GPI
+
+  const potentialGrossIncome = totalMonthlyRent * 12;
   const vacancyLoss = potentialGrossIncome * (vacancyRate / 100);
   const effectiveGrossIncome = potentialGrossIncome - vacancyLoss;
 
-  // Expenses
   const propertyTaxAnnual = purchasePrice * (propertyTaxRate / 100);
 
-  // Management based on Gross Rent (AGR)
   const managementAnnual =
-    managementType === 'percent'
+    managementType === "percent"
       ? potentialGrossIncome * (managementPercent / 100)
       : managementFlat;
 
-  // Loan
   const loanAmount = purchasePrice - downPayment;
   const monthlyRate = (interestRate / 100) / 12;
   const numberOfPayments = loanTerm * 12;
@@ -149,7 +105,6 @@ const App = () => {
   const monthlyMortgage = calculateMonthlyMortgage();
   const annualDebtService = monthlyMortgage * 12;
 
-  // Operating expenses
   const totalOperatingExpenses =
     managementAnnual +
     maintenanceAnnual +
@@ -157,14 +112,11 @@ const App = () => {
     insuranceAnnual +
     parseFloat(otherExpenses || 0);
 
-  // NOI & CF
   const netOperatingIncome = effectiveGrossIncome - totalOperatingExpenses;
   const annualCashFlow = netOperatingIncome - annualDebtService;
 
-  // Cash investment
   const totalInitialInvestment = downPayment + closingCosts + initialCapEx;
 
-  // KPIs
   const cashOnCashROI =
     totalInitialInvestment > 0
       ? (annualCashFlow / totalInitialInvestment) * 100
@@ -184,18 +136,20 @@ const App = () => {
   const dscr =
     annualDebtService > 0 ? netOperatingIncome / annualDebtService : 0;
 
-  const dscrText =
+  const dscrStatus =
     dscr === 0
-      ? 'N/A'
+      ? "N/A"
       : dscr < 1.2
-      ? 'Yellow (Borderline)'
+      ? "Red (Below Lender Min.)"
       : dscr < 1.35
-      ? 'Yellow (Borderline)'
-      : 'Green (Strong)';
+      ? "Yellow (Borderline)"
+      : "Green (Strong)";
 
-  // --- Scenario helpers ---
+  // --- Scenario persistence (localStorage) ---
 
-  const buildScenarioPayload = () => ({
+  const SCENARIO_STORAGE_KEY = "mf_roi_scenarios_v1";
+
+  const captureScenarioData = () => ({
     address,
     mlsNumber,
     purchasePrice,
@@ -212,99 +166,93 @@ const App = () => {
     managementType,
     managementPercent,
     managementFlat,
-    units
+    units,
   });
 
-  const loadScenarioPayload = (data) => {
+  const applyScenarioData = (data) => {
     if (!data) return;
-    setAddress(data.address ?? '');
-    setMlsNumber(data.mlsNumber ?? '');
-    setPurchasePrice(data.purchasePrice ?? 0);
-    setDownPayment(data.downPayment ?? 0);
-    setInterestRate(data.interestRate ?? 0);
-    setLoanTerm(data.loanTerm ?? 0);
-    setClosingCosts(data.closingCosts ?? 0);
-    setInitialCapEx(data.initialCapEx ?? 0);
-    setVacancyRate(data.vacancyRate ?? 0);
-    setMaintenanceAnnual(data.maintenanceAnnual ?? 0);
-    setOtherExpenses(data.otherExpenses ?? 0);
-    setPropertyTaxRate(data.propertyTaxRate ?? 0);
-    setInsuranceAnnual(data.insuranceAnnual ?? 0);
-    setManagementType(data.managementType ?? 'percent');
-    setManagementPercent(data.managementPercent ?? 0);
-    setManagementFlat(data.managementFlat ?? 0);
-    setUnits(data.units ?? defaultUnits);
+    setAddress(data.address || "");
+    setMlsNumber(data.mlsNumber || "");
+    setPurchasePrice(data.purchasePrice || 0);
+    setDownPayment(data.downPayment || 0);
+    setInterestRate(data.interestRate || 0);
+    setLoanTerm(data.loanTerm || 0);
+    setClosingCosts(data.closingCosts || 0);
+    setInitialCapEx(data.initialCapEx || 0);
+    setVacancyRate(data.vacancyRate || 0);
+    setMaintenanceAnnual(data.maintenanceAnnual || 0);
+    setOtherExpenses(data.otherExpenses || 0);
+    setPropertyTaxRate(data.propertyTaxRate || 0);
+    setInsuranceAnnual(data.insuranceAnnual || 0);
+    setManagementType(data.managementType || "percent");
+    setManagementPercent(data.managementPercent || 0);
+    setManagementFlat(data.managementFlat || 0);
+    setUnits(data.units && data.units.length ? data.units : units);
+  };
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(SCENARIO_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setSavedScenarios(parsed);
+      }
+    } catch (err) {
+      console.error("Failed to load scenarios:", err);
+    }
+  }, []);
+
+  const persistScenarios = (list) => {
+    setSavedScenarios(list);
+    try {
+      window.localStorage.setItem(SCENARIO_STORAGE_KEY, JSON.stringify(list));
+    } catch (err) {
+      console.error("Failed to save scenarios:", err);
+    }
   };
 
   const handleSaveScenario = () => {
-    const nameBase = address || 'Property';
     if (!selectedScenarioId) {
-      // If nothing selected, treat as "Save as New"
-      handleSaveScenarioAsNew();
+      // Treat as "Save As New" if none selected
+      handleSaveAsNewScenario();
       return;
     }
-    setScenarios((prev) =>
-      prev.map((sc) =>
-        sc.id === selectedScenarioId
-          ? { ...sc, data: buildScenarioPayload() }
-          : sc
-      )
+    const updated = savedScenarios.map((s) =>
+      s.id === selectedScenarioId ? { ...s, data: captureScenarioData() } : s
     );
+    persistScenarios(updated);
   };
 
-  const handleSaveScenarioAsNew = () => {
-    const id = Date.now();
-    const nameBase = address || 'Property';
-    const name = `${nameBase} – Scenario ${scenarios.length + 1}`;
+  const handleSaveAsNewScenario = () => {
+    const baseName = address || "Scenario";
+    const newId = Date.now().toString();
     const newScenario = {
-      id,
-      name,
-      data: buildScenarioPayload()
+      id: newId,
+      name: `${baseName} – Scenario ${savedScenarios.length + 1}`,
+      data: captureScenarioData(),
     };
-    setScenarios((prev) => [...prev, newScenario]);
-    setSelectedScenarioId(id);
+    const updated = [...savedScenarios, newScenario];
+    persistScenarios(updated);
+    setSelectedScenarioId(newId);
   };
 
   const handleDeleteScenario = () => {
     if (!selectedScenarioId) return;
-    setScenarios((prev) =>
-      prev.filter((sc) => sc.id !== selectedScenarioId)
-    );
-    setSelectedScenarioId(null);
+    const updated = savedScenarios.filter((s) => s.id !== selectedScenarioId);
+    persistScenarios(updated);
+    setSelectedScenarioId("");
   };
 
-  const handleSelectScenario = (e) => {
-    const value = e.target.value;
-    if (!value) {
-      setSelectedScenarioId(null);
-      return;
-    }
-    const id = Number(value);
+  const handleSelectScenario = (id) => {
     setSelectedScenarioId(id);
-    const scenario = scenarios.find((sc) => sc.id === id);
-    if (scenario) {
-      loadScenarioPayload(scenario.data);
-    }
+    const scenario = savedScenarios.find((s) => s.id === id);
+    if (scenario) applyScenarioData(scenario.data);
   };
 
-  // --- Other handlers ---
-
-  const addUnit = () => {
-    const newId =
-      units.length > 0 ? Math.max(...units.map((u) => u.id)) + 1 : 1;
-    setUnits([...units, { id: newId, beds: 2, baths: 1, rent: 1000 }]);
-  };
-
-  const removeUnit = (id) => {
-    setUnits(units.filter((u) => u.id !== id));
-  };
-
-  const updateUnit = (id, field, value) => {
-    setUnits(units.map((u) => (u.id === id ? { ...u, [field]: value } : u)));
-  };
+  // --- Actions ---
 
   const handlePrint = () => {
-    window.print(); // User chooses "Save as PDF"
+    window.print();
   };
 
   const generateReportText = () => {
@@ -315,14 +263,14 @@ const App = () => {
             u.rent
           )}/mo`
       )
-      .join('\n');
+      .join("\n");
 
     return `
 # Investment Performance Report
 
 ## Property & Assumptions
-- Address/Name: ${address || 'N/A'}
-- MLS Number: ${mlsNumber || 'N/A'}
+- Address/Name: ${address || "N/A"}
+- MLS Number: ${mlsNumber || "N/A"}
 - Units: ${units.length}
 
 ### Acquisition Details
@@ -351,9 +299,9 @@ const App = () => {
 - Property Taxes (${propertyTaxRate}%): ${formatCurrency(propertyTaxAnnual)}
 - Insurance (Annual): ${formatCurrency(insuranceAnnual)}
 - Management Fee (${
-      managementType === 'percent'
+      managementType === "percent"
         ? `${managementPercent}% of GPI`
-        : 'Flat'
+        : "Flat"
     }): ${formatCurrency(managementAnnual)}
 - Maintenance (Annual): ${formatCurrency(maintenanceAnnual)}
 - Other/HOA (Annual): ${formatCurrency(otherExpenses)}
@@ -372,7 +320,7 @@ const App = () => {
 - Cash-on-Cash Return (CoC): ${formatPercent(cashOnCashROI)}
 - Capitalization Rate (Cap Rate): ${formatPercent(capRate)}
 - Gross Rent Multiplier (GRM): ${formatNumber(grossRentMultiplier)}x
-- DSCR: ${formatNumber(dscr)} (${dscrText})
+- DSCR: ${formatNumber(dscr)} (${dscrStatus})
 
 ---
 
@@ -383,22 +331,38 @@ ${unitMixDetails}
 
   const handleExportToText = () => {
     const reportText = generateReportText();
-    const tempTextarea = document.createElement('textarea');
+    const tempTextarea = document.createElement("textarea");
     tempTextarea.value = reportText;
     document.body.appendChild(tempTextarea);
     tempTextarea.select();
     try {
-      document.execCommand('copy');
-      setCopySuccess('Report copied! Paste into email/Word/Notes.');
+      document.execCommand("copy");
+      setCopySuccess("Report copied! Paste into email/Word/Notes.");
     } catch (err) {
-      console.error('Failed to copy text: ', err);
-      setCopySuccess('Failed to copy. Please try again.');
+      console.error("Failed to copy text: ", err);
+      setCopySuccess("Failed to copy. Please try again.");
     }
     document.body.removeChild(tempTextarea);
-    setTimeout(() => setCopySuccess(''), 4000);
+    setTimeout(() => setCopySuccess(""), 4000);
   };
 
-  // --- JSX ---
+  // --- Unit handlers ---
+
+  const addUnit = () => {
+    const newId =
+      units.length > 0 ? Math.max(...units.map((u) => u.id)) + 1 : 1;
+    setUnits([...units, { id: newId, beds: 2, baths: 1, rent: 1000 }]);
+  };
+
+  const removeUnit = (id) => {
+    setUnits(units.filter((u) => u.id !== id));
+  };
+
+  const updateUnit = (id, field, value) => {
+    setUnits(units.map((u) => (u.id === id ? { ...u, [field]: value } : u)));
+  };
+
+  // --- Render ---
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-4 print:bg-white">
@@ -408,30 +372,30 @@ ${unitMixDetails}
           {/* Left: Logo + analysis label */}
           <div className="flex items-center gap-4">
             <img
-  src="/JS-contact-logo.png.PNG"
-  alt="Jonathan Sarrow Contact Logo"
-  className="h-24 w-auto"
-  style={{ objectFit: "contain" }}
-/>
+              src="/JS-contact-logo.png"
+              alt="Jonathan Sarrow Contact Logo"
+              className="h-16 w-auto"
+              style={{ objectFit: "contain" }}
+            />
             <div>
-              <div className="text-[0.8rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
+              <div className="text-[0.75rem] font-semibold tracking-[0.16em] uppercase text-slate-600">
                 Multifamily Investment Analysis
               </div>
               <div className="text-xs text-slate-500 mt-1">
-                Prepared for:{' '}
+                Prepared for{" "}
                 <span className="font-semibold">
-                  {address || '4-Unit Residential Property'}
+                  {address || "Subject Property"}
                 </span>
               </div>
               {mlsNumber && (
-                <div className="text-xs text-slate-400 mt-0.5">
+                <div className="text-[0.7rem] text-slate-400 mt-0.5">
                   MLS #{mlsNumber}
                 </div>
               )}
             </div>
           </div>
 
-          {/* Right: buttons & status */}
+          {/* Right: buttons */}
           <div className="flex flex-col items-stretch md:items-end gap-2 w-full md:w-auto">
             {copySuccess && (
               <div className="bg-green-100 text-green-700 py-1 px-3 rounded-full text-xs flex items-center gap-2">
@@ -459,38 +423,66 @@ ${unitMixDetails}
           </div>
         </div>
 
-        {/* Thin divider line under header, CBRE-style */}
-        <div className="border-b border-slate-200 mt-4" />
-      </div>
+        {/* Saved Scenarios Bar */}
+        <div className="mt-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="text-[0.7rem] uppercase tracking-[0.16em] text-slate-500">
+            Saved Scenarios
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center w-full md:w-auto">
+            <select
+              className="flex-1 min-w-[220px] border border-slate-300 rounded-md px-3 py-1.5 text-sm bg-white"
+              value={selectedScenarioId}
+              onChange={(e) => handleSelectScenario(e.target.value)}
+            >
+              <option value="">Select scenario...</option>
+              {savedScenarios.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
 
-      {/* Printable Header (for PDF / printouts) */}
-      <div className="hidden print:block max-w-6xl mx-auto mb-6 pb-3 border-b border-slate-300">
-        <div className="flex justify-between items-center gap-4">
-          {/* Left: logo + analysis label */}
-          <div className="flex items-center gap-4">
-            <img
-  src="/JS-contact-logo.png.PNG"
-  alt="Jonathan Sarrow Contact Logo"
-  className="h-24 w-auto"
-  style={{ objectFit: "contain" }}
-/>
-            <div>
-              <div className="text-[0.7rem] font-semibold tracking-[0.18em] uppercase text-slate-700">
-                Multifamily Investment Analysis
-              </div>
-              <div className="text-[0.65rem] text-slate-500 mt-1">
-                Prepared by Jonathan Sarrow, Realtor®
-              </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSaveScenario}
+                className="px-3 py-1.5 text-xs border border-slate-300 rounded-md bg-white hover:bg-slate-50"
+              >
+                Save
+              </button>
+              <button
+                onClick={handleSaveAsNewScenario}
+                className="px-3 py-1.5 text-xs border border-blue-500 text-blue-600 rounded-md bg-white hover:bg-blue-50"
+              >
+                Save as New
+              </button>
+              <button
+                onClick={handleDeleteScenario}
+                className="px-3 py-1.5 text-xs border border-rose-400 text-rose-500 rounded-md bg-white hover:bg-rose-50"
+              >
+                Delete
+              </button>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Right: subject property & date */}
+      {/* Printable Header (for PDF) */}
+      <div className="hidden print:block max-w-6xl mx-auto mb-4 pb-3 border-b border-slate-300">
+        <div className="flex justify-between items-center gap-4">
+          <div className="flex items-center gap-4">
+            <img
+              src="/JS-contact-logo.png"
+              alt="Jonathan Sarrow Contact Logo"
+              className="h-18 w-auto"
+              style={{ objectFit: "contain" }}
+            />
+          </div>
           <div className="text-right">
-            <div className="text-[0.65rem] uppercase tracking-[0.18em] text-slate-500">
+            <div className="text-[0.65rem] uppercase tracking-[0.16em] text-slate-500">
               Subject Property
             </div>
             <div className="text-sm font-semibold text-slate-900">
-              {address || 'Investment Property Prospectus'}
+              {address || "Investment Property Prospectus"}
             </div>
             {mlsNumber && (
               <div className="text-xs text-slate-500 mt-0.5">
@@ -500,54 +492,6 @@ ${unitMixDetails}
             <div className="text-[0.65rem] text-slate-500 mt-2">
               Date Generated: {new Date().toLocaleDateString()}
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Saved Scenarios Bar (desktop only, not printed) */}
-      <div className="max-w-6xl mx-auto mb-4 print:hidden">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <div className="flex-1">
-            <label className="block text-[0.65rem] uppercase tracking-[0.18em] text-slate-500 mb-1">
-              Saved Scenarios
-            </label>
-            <select
-              value={selectedScenarioId || ''}
-              onChange={handleSelectScenario}
-              className="w-full md:w-80 border border-slate-300 rounded-md px-3 py-2 text-sm bg-white"
-            >
-              <option value="">Select scenario...</option>
-              {scenarios.map((sc) => (
-                <option key={sc.id} value={sc.id}>
-                  {sc.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={handleSaveScenario}
-              className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white hover:bg-slate-50"
-            >
-              Save
-            </button>
-            <button
-              onClick={handleSaveScenarioAsNew}
-              className="px-4 py-2 text-xs font-medium rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
-            >
-              Save as New
-            </button>
-            <button
-              onClick={handleDeleteScenario}
-              disabled={!selectedScenarioId}
-              className={`px-4 py-2 text-xs font-medium rounded-lg border ${
-                selectedScenarioId
-                  ? 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100'
-                  : 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'
-              }`}
-            >
-              Delete
-            </button>
           </div>
         </div>
       </div>
@@ -786,21 +730,21 @@ ${unitMixDetails}
                   </label>
                   <div className="flex bg-white rounded-md border border-slate-300 p-0.5">
                     <button
-                      onClick={() => setManagementType('percent')}
+                      onClick={() => setManagementType("percent")}
                       className={`px-2 py-0.5 text-xs rounded-sm transition-colors ${
-                        managementType === 'percent'
-                          ? 'bg-blue-100 text-blue-700 font-bold'
-                          : 'text-slate-500'
+                        managementType === "percent"
+                          ? "bg-blue-100 text-blue-700 font-bold"
+                          : "text-slate-500"
                       }`}
                     >
                       % Rent
                     </button>
                     <button
-                      onClick={() => setManagementType('flat')}
+                      onClick={() => setManagementType("flat")}
                       className={`px-2 py-0.5 text-xs rounded-sm transition-colors ${
-                        managementType === 'flat'
-                          ? 'bg-blue-100 text-blue-700 font-bold'
-                          : 'text-slate-500'
+                        managementType === "flat"
+                          ? "bg-blue-100 text-blue-700 font-bold"
+                          : "text-slate-500"
                       }`}
                     >
                       Flat $
@@ -808,7 +752,7 @@ ${unitMixDetails}
                   </div>
                 </div>
 
-                {managementType === 'percent' ? (
+                {managementType === "percent" ? (
                   <div className="flex gap-3 items-center">
                     <div className="relative flex-1">
                       <input
@@ -847,9 +791,9 @@ ${unitMixDetails}
                 )}
 
                 <p className="text-xs text-slate-400 mt-1">
-                  {managementType === 'percent'
-                    ? 'Based on Gross Potential Income (GPI)'
-                    : 'Annual Flat Fee'}
+                  {managementType === "percent"
+                    ? "Based on Gross Potential Income (GPI)"
+                    : "Annual Flat Fee"}
                 </p>
               </div>
 
@@ -884,7 +828,7 @@ ${unitMixDetails}
               </div>
 
               <div className="mt-3 text-xs text-slate-500">
-                OpEx % of Gross Rent:{' '}
+                OpEx % of Gross Rent:{" "}
                 <span className="font-semibold">
                   {formatPercent(opexRatio)}
                 </span>
@@ -893,35 +837,65 @@ ${unitMixDetails}
           </section>
         </div>
 
-        {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
-        <div className="lg:col-span-7 space-y-3">
-          {/* KPI Cards – using shared KpiCard so everything lines up */}
+        {/* RIGHT COLUMN: KPI + OUTPUT + UNIT MIX */}
+        <div className="lg:col-span-7 space-y-4">
+          {/* KPI Strip */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <KpiCard
-              line1="Annual Cash"
-              line2="Flow"
-              value={formatCurrency(annualCashFlow)}
-              valueClass={annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'}
-              bottom="Per Year"
-            />
-            <KpiCard
-              line1="Cash-on-Cash"
-              line2="ROI"
-              value={formatPercent(cashOnCashROI)}
-              bottom="On Initial Cash"
-            />
-            <KpiCard
-              line1="Cap"
-              line2="Rate"
-              value={formatPercent(capRate)}
-              bottom="On Purchase Price"
-            />
-            <KpiCard
-              line1="Debt Service"
-              line2="Coverage"
-              value={formatNumber(dscr)}
-              bottom={dscrText.toUpperCase()}
-            />
+            {/* Annual Cash Flow */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
+              <div className="text-[0.65rem] font-semibold tracking-[0.16em] uppercase text-slate-500">
+                Annual Cash Flow
+              </div>
+              <div
+                className={`mt-1 text-2xl font-extrabold ${
+                  annualCashFlow >= 0 ? "text-green-700" : "text-red-700"
+                }`}
+              >
+                {formatCurrency(annualCashFlow)}
+              </div>
+              <div className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                Per Year
+              </div>
+            </div>
+
+            {/* Cash-on-Cash ROI */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
+              <div className="text-[0.65rem] font-semibold tracking-[0.16em] uppercase text-slate-500">
+                Cash-On-Cash ROI
+              </div>
+              <div className="mt-1 text-2xl font-extrabold text-slate-800">
+                {formatPercent(cashOnCashROI)}
+              </div>
+              <div className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                On Initial Cash
+              </div>
+            </div>
+
+            {/* Cap Rate */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
+              <div className="text-[0.65rem] font-semibold tracking-[0.16em] uppercase text-slate-500">
+                Cap Rate
+              </div>
+              <div className="mt-1 text-2xl font-extrabold text-slate-800">
+                {formatPercent(capRate)}
+              </div>
+              <div className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                On Purchase Price
+              </div>
+            </div>
+
+            {/* DSCR */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
+              <div className="text-[0.65rem] font-semibold tracking-[0.16em] uppercase text-slate-500">
+                DSCR
+              </div>
+              <div className="mt-1 text-2xl font-extrabold text-slate-800">
+                {formatNumber(dscr)}
+              </div>
+              <div className="mt-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                {dscrStatus}
+              </div>
+            </div>
           </div>
 
           {/* Pro Forma Annual Financials */}
@@ -976,9 +950,9 @@ ${unitMixDetails}
                 <div className="grid grid-cols-2 py-1">
                   <span className="text-slate-600 text-sm pl-4">
                     Management (
-                    {managementType === 'percent'
+                    {managementType === "percent"
                       ? `${managementPercent}% of GPI`
-                      : 'Flat'}
+                      : "Flat"}
                     )
                   </span>
                   <span className="text-right text-slate-600 text-sm">
@@ -1046,12 +1020,12 @@ ${unitMixDetails}
           {/* Unit Mix */}
           <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-              <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+              <h3 className="font-semibold text-slate-800 flex itemscenter gap-2">
                 <Home size={18} />
                 Unit Mix Breakdown
               </h3>
               <span className="text-sm text-slate-500 font-medium">
-                {units.length} Units Total • Monthly Total:{' '}
+                {units.length} Units Total • Monthly Total:{" "}
                 {formatCurrency(totalMonthlyRent)}
               </span>
             </div>
@@ -1065,7 +1039,7 @@ ${unitMixDetails}
                       <th className="p-3">Bedrooms</th>
                       <th className="p-3">Bathrooms</th>
                       <th className="p-3">Monthly Rent</th>
-                      <th className="p-3 rounded-r-lg print:hidden">Actions</th>
+                      <th className="p-3 rounded-r-lg print-hidden">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -1082,7 +1056,7 @@ ${unitMixDetails}
                             onChange={(e) =>
                               updateUnit(
                                 unit.id,
-                                'beds',
+                                "beds",
                                 parseFloat(e.target.value) || 0
                               )
                             }
@@ -1096,7 +1070,7 @@ ${unitMixDetails}
                             onChange={(e) =>
                               updateUnit(
                                 unit.id,
-                                'baths',
+                                "baths",
                                 parseFloat(e.target.value) || 0
                               )
                             }
@@ -1114,14 +1088,14 @@ ${unitMixDetails}
                               onChange={(e) =>
                                 updateUnit(
                                   unit.id,
-                                  'rent',
+                                  "rent",
                                   parseFloat(e.target.value) || 0
                                 )
                               }
                             />
                           </div>
                         </td>
-                        <td className="p-3 print:hidden">
+                        <td className="p-3 print-hidden">
                           <button
                             onClick={() => removeUnit(unit.id)}
                             className="text-slate-400 hover:text-red-500 transition-colors"
@@ -1136,7 +1110,7 @@ ${unitMixDetails}
                 </table>
               </div>
 
-              <div className="mt-4 px-4 md:px-0 print:hidden">
+              <div className="mt-4 px-4 md:px-0 print-hidden">
                 <button
                   onClick={addUnit}
                   className="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
@@ -1148,11 +1122,6 @@ ${unitMixDetails}
             </div>
           </section>
         </div>
-      </div>
-
-           {/* Optional disclaimer footer (no contact info) */}
-      <div className="max-w-6xl mx-auto mt-6 mb-4 text-center text-[0.65rem] text-slate-400 print:hidden">
-        <p>Generated via Multifamily ROI Analyzer. For estimation purposes only.</p>
       </div>
     </div>
   );
