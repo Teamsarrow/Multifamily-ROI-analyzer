@@ -39,9 +39,9 @@
       padding-bottom: 6px !important;
       box-sizing: border-box !important;
     }
-  /* Remove extra space above Cash-on-cash value (PDF only) */
+/* Nudge Cash-on-cash value closer to its title (PDF only) */
 .kpi-cashoncash .kpi-value {
-  margin-top: 0 !important;
+  margin-top: -2px !important;  /* try -2px; if still a hair off, you can use -3px */
 }
   }
 </style>
