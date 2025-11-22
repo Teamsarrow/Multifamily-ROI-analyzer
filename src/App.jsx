@@ -1128,8 +1128,13 @@ ${unitMixDetails}
           </section>
         </div>
       </div>
-    </div>
-  );
+      {/* Footer Disclaimer */}
+<div className="text-center text-[0.65rem] text-slate-400 mt-12 mb-6 print:text-[0.55rem] print:mt-16 print:mb-0">
+  *All calculations are estimates only and are not guaranteed. Buyer and investor to verify all figures independently.
+</div>
+
+</div>  {/* <-- This closes the outermost container */}
+);
 };
 
 export default App;
