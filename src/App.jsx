@@ -892,7 +892,7 @@ ${unitMixDetails}
         </div>
 
         {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
-        <div className="lg:col-span-7 space-y-6">
+        <div className="lg:col-span-7 space-y-3">
           {/* KPI Cards – using shared KpiCard so everything lines up */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <KpiCard
@@ -1148,7 +1148,8 @@ ${unitMixDetails}
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto mt-8 text-center text-xs text-slate-400">
+           {/* Optional disclaimer footer (no contact info) */}
+      <div className="max-w-6xl mx-auto mt-6 mb-4 text-center text-[0.65rem] text-slate-400 print:hidden">
         <p>Generated via Multifamily ROI Analyzer. For estimation purposes only.</p>
       </div>
     </div>
