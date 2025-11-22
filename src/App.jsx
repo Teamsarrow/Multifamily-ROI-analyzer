@@ -11,7 +11,28 @@ import {
   Copy
 } from 'lucide-react';
 
-const DEFAULT_UNITS = [
+/**
+ * Simple reusable KPI card, so all four KPIs line up perfectly.
+ */
+const KpiCard = ({ line1, line2, value, valueClass = '', bottom }) => (
+  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-28">
+    <div className="mt-1">
+      <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+        {line1}
+        <br />
+        {line2}
+      </div>
+      <div className={`mt-1 text-2xl font-extrabold ${valueClass || 'text-slate-800'}`}>
+        {value}
+      </div>
+    </div>
+    <div className="mb-1 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+      {bottom}
+    </div>
+  </div>
+);
+
+const defaultUnits = [
   { id: 1, beds: 2, baths: 1, rent: 1200 },
   { id: 2, beds: 2, baths: 1, rent: 1200 },
   { id: 3, beds: 1, baths: 1, rent: 950 },
@@ -51,27 +72,29 @@ const App = () => {
   const [managementFlat, setManagementFlat] = useState(3000);
 
   // Units
-  const [units, setUnits] = useState(DEFAULT_UNITS);
+  const [units, setUnits] = useState(defaultUnits);
 
   // Saved scenarios
-  const [scenarios, setScenarios] = useState(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      const raw = window.localStorage.getItem('mf_roi_scenarios');
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  });
-  const [selectedScenarioKey, setSelectedScenarioKey] = useState('');
+  const [scenarios, setScenarios] = useState([]);
+  const [selectedScenarioId, setSelectedScenarioId] = useState(null);
 
-  // Persist scenarios
+  // --- Load / persist scenarios to localStorage ---
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    try {
+      const stored = window.localStorage.getItem('mf_roi_scenarios');
+      if (stored) {
+        setScenarios(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Error loading scenarios from localStorage', e);
+    }
+  }, []);
+
+  useEffect(() => {
     try {
       window.localStorage.setItem('mf_roi_scenarios', JSON.stringify(scenarios));
     } catch (e) {
-      console.error('Error saving scenarios', e);
+      console.error('Error saving scenarios to localStorage', e);
     }
   }, [scenarios]);
 
@@ -165,14 +188,14 @@ const App = () => {
     dscr === 0
       ? 'N/A'
       : dscr < 1.2
-      ? 'Red (Below Lender Minimum)'
+      ? 'Yellow (Borderline)'
       : dscr < 1.35
       ? 'Yellow (Borderline)'
       : 'Green (Strong)';
 
   // --- Scenario helpers ---
 
-  const getCurrentScenarioData = () => ({
+  const buildScenarioPayload = () => ({
     address,
     mlsNumber,
     purchasePrice,
@@ -192,10 +215,10 @@ const App = () => {
     units
   });
 
-  const loadScenarioData = (data) => {
+  const loadScenarioPayload = (data) => {
     if (!data) return;
-    setAddress(data.address || '');
-    setMlsNumber(data.mlsNumber || '');
+    setAddress(data.address ?? '');
+    setMlsNumber(data.mlsNumber ?? '');
     setPurchasePrice(data.purchasePrice ?? 0);
     setDownPayment(data.downPayment ?? 0);
     setInterestRate(data.interestRate ?? 0);
@@ -207,64 +230,60 @@ const App = () => {
     setOtherExpenses(data.otherExpenses ?? 0);
     setPropertyTaxRate(data.propertyTaxRate ?? 0);
     setInsuranceAnnual(data.insuranceAnnual ?? 0);
-    setManagementType(data.managementType || 'percent');
+    setManagementType(data.managementType ?? 'percent');
     setManagementPercent(data.managementPercent ?? 0);
     setManagementFlat(data.managementFlat ?? 0);
-    setUnits(
-      Array.isArray(data.units) && data.units.length > 0
-        ? data.units
-        : DEFAULT_UNITS
-    );
+    setUnits(data.units ?? defaultUnits);
   };
 
-  const handleSaveAsNew = () => {
-    const defaultName =
-      address && address.trim().length > 0
-        ? `${address} – Scenario ${scenarios.length + 1}`
-        : `Scenario ${scenarios.length + 1}`;
-    const name = window.prompt('Scenario name:', defaultName);
-    if (!name) return;
-    const key = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const newScenario = {
-      key,
-      name,
-      data: getCurrentScenarioData()
-    };
-    setScenarios((prev) => [...prev, newScenario]);
-    setSelectedScenarioKey(key);
-  };
-
-  const handleSave = () => {
-    // If nothing selected yet, treat "Save" as "Save As New"
-    if (!selectedScenarioKey) {
-      handleSaveAsNew();
+  const handleSaveScenario = () => {
+    const nameBase = address || 'Property';
+    if (!selectedScenarioId) {
+      // If nothing selected, treat as "Save as New"
+      handleSaveScenarioAsNew();
       return;
     }
     setScenarios((prev) =>
-      prev.map((s) =>
-        s.key === selectedScenarioKey
-          ? { ...s, data: getCurrentScenarioData() }
-          : s
+      prev.map((sc) =>
+        sc.id === selectedScenarioId
+          ? { ...sc, data: buildScenarioPayload() }
+          : sc
       )
     );
   };
 
-  const handleDelete = () => {
-    if (!selectedScenarioKey) return;
-    const confirmDelete = window.confirm('Delete this scenario?');
-    if (!confirmDelete) return;
+  const handleSaveScenarioAsNew = () => {
+    const id = Date.now();
+    const nameBase = address || 'Property';
+    const name = `${nameBase} – Scenario ${scenarios.length + 1}`;
+    const newScenario = {
+      id,
+      name,
+      data: buildScenarioPayload()
+    };
+    setScenarios((prev) => [...prev, newScenario]);
+    setSelectedScenarioId(id);
+  };
+
+  const handleDeleteScenario = () => {
+    if (!selectedScenarioId) return;
     setScenarios((prev) =>
-      prev.filter((s) => s.key !== selectedScenarioKey)
+      prev.filter((sc) => sc.id !== selectedScenarioId)
     );
-    setSelectedScenarioKey('');
+    setSelectedScenarioId(null);
   };
 
   const handleSelectScenario = (e) => {
-    const key = e.target.value;
-    setSelectedScenarioKey(key);
-    const scenario = scenarios.find((s) => s.key === key);
+    const value = e.target.value;
+    if (!value) {
+      setSelectedScenarioId(null);
+      return;
+    }
+    const id = Number(value);
+    setSelectedScenarioId(id);
+    const scenario = scenarios.find((sc) => sc.id === id);
     if (scenario) {
-      loadScenarioData(scenario.data);
+      loadScenarioPayload(scenario.data);
     }
   };
 
@@ -439,54 +458,8 @@ ${unitMixDetails}
           </div>
         </div>
 
-        {/* Thin divider line under header */}
+        {/* Thin divider line under header, CBRE-style */}
         <div className="border-b border-slate-200 mt-4" />
-      </div>
-
-      {/* Saved Scenarios Bar (web only) */}
-      <div className="max-w-6xl mx-auto mb-4 flex items-center justify-between gap-3 text-xs print:hidden">
-        <div className="flex items-center gap-2">
-          <span className="uppercase tracking-[0.18em] text-slate-500">
-            Saved Scenarios
-          </span>
-          <select
-            value={selectedScenarioKey}
-            onChange={handleSelectScenario}
-            className="border border-slate-300 rounded-md px-2 py-1 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select scenario...</option>
-            {scenarios.map((s) => (
-              <option key={s.key} value={s.key}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleSave}
-            className="px-3 py-1 rounded-md border border-slate-300 text-slate-700 bg-white hover:bg-slate-100 transition-colors"
-          >
-            Save
-          </button>
-          <button
-            onClick={handleSaveAsNew}
-            className="px-3 py-1 rounded-md border border-slate-300 text-slate-700 bg-white hover:bg-slate-100 transition-colors"
-          >
-            Save as New
-          </button>
-          <button
-            onClick={handleDelete}
-            disabled={!selectedScenarioKey}
-            className={`px-3 py-1 rounded-md border text-slate-700 transition-colors ${
-              selectedScenarioKey
-                ? 'border-red-300 bg-white hover:bg-red-50 hover:text-red-700'
-                : 'border-slate-200 bg-slate-100 text-slate-300 cursor-not-allowed'
-            }`}
-          >
-            Delete
-          </button>
-        </div>
       </div>
 
       {/* Printable Header (for PDF / printouts) */}
@@ -525,6 +498,54 @@ ${unitMixDetails}
             <div className="text-[0.65rem] text-slate-500 mt-2">
               Date Generated: {new Date().toLocaleDateString()}
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Saved Scenarios Bar (desktop only, not printed) */}
+      <div className="max-w-6xl mx-auto mb-4 print:hidden">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="flex-1">
+            <label className="block text-[0.65rem] uppercase tracking-[0.18em] text-slate-500 mb-1">
+              Saved Scenarios
+            </label>
+            <select
+              value={selectedScenarioId || ''}
+              onChange={handleSelectScenario}
+              className="w-full md:w-80 border border-slate-300 rounded-md px-3 py-2 text-sm bg-white"
+            >
+              <option value="">Select scenario...</option>
+              {scenarios.map((sc) => (
+                <option key={sc.id} value={sc.id}>
+                  {sc.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSaveScenario}
+              className="px-4 py-2 text-xs font-medium rounded-lg border border-slate-300 bg-white hover:bg-slate-50"
+            >
+              Save
+            </button>
+            <button
+              onClick={handleSaveScenarioAsNew}
+              className="px-4 py-2 text-xs font-medium rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
+            >
+              Save as New
+            </button>
+            <button
+              onClick={handleDeleteScenario}
+              disabled={!selectedScenarioId}
+              className={`px-4 py-2 text-xs font-medium rounded-lg border ${
+                selectedScenarioId
+                  ? 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100'
+                  : 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              Delete
+            </button>
           </div>
         </div>
       </div>
@@ -872,74 +893,33 @@ ${unitMixDetails}
 
         {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
         <div className="lg:col-span-7 space-y-6">
-          {/* KPI Cards – brokerage style, aligned */}
+          {/* KPI Cards – using shared KpiCard so everything lines up */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Annual Cash Flow */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
-              <div>
-                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  Annual<br />Cash Flow
-                </div>
-                <div
-                  className={`mt-2 text-2xl font-extrabold ${
-                    annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
-                  }`}
-                >
-                  {formatCurrency(annualCashFlow)}
-                </div>
-              </div>
-              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-                Per Year
-              </div>
-            </div>
-
-            {/* Cash-on-Cash ROI */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
-              <div>
-                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  Cash-On-Cash<br />ROI
-                </div>
-                <div className="mt-2 text-2xl font-extrabold text-slate-800">
-                  {formatPercent(cashOnCashROI)}
-                </div>
-              </div>
-              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-                On Initial Cash
-              </div>
-            </div>
-
-            {/* Cap Rate */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
-              <div>
-                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  Cap<br />Rate
-                </div>
-                <div className="mt-2 text-2xl font-extrabold text-slate-800">
-                  {formatPercent(capRate)}
-                </div>
-              </div>
-              <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-                On Purchase Price
-              </div>
-            </div>
-
-            {/* DSCR – value + label tight */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
-              <div>
-                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-                  Debt Service<br />Coverage
-                </div>
-                <div className="mt-2 flex flex-col items-center leading-tight">
-                  <div className="text-2xl font-extrabold text-slate-800">
-                    {formatNumber(dscr)}
-                  </div>
-                  <div className="text-[0.6rem] text-slate-400 uppercase tracking-wide mt-0.5">
-                    {dscrText}
-                  </div>
-                </div>
-              </div>
-              <div className="pb-1" />
-            </div>
+            <KpiCard
+              line1="Annual Cash"
+              line2="Flow"
+              value={formatCurrency(annualCashFlow)}
+              valueClass={annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'}
+              bottom="Per Year"
+            />
+            <KpiCard
+              line1="Cash-on-Cash"
+              line2="ROI"
+              value={formatPercent(cashOnCashROI)}
+              bottom="On Initial Cash"
+            />
+            <KpiCard
+              line1="Cap"
+              line2="Rate"
+              value={formatPercent(capRate)}
+              bottom="On Purchase Price"
+            />
+            <KpiCard
+              line1="Debt Service"
+              line2="Coverage"
+              value={formatNumber(dscr)}
+              bottom={dscrText.toUpperCase()}
+            />
           </div>
 
           {/* Pro Forma Annual Financials */}
@@ -1083,7 +1063,7 @@ ${unitMixDetails}
                       <th className="p-3">Bedrooms</th>
                       <th className="p-3">Bathrooms</th>
                       <th className="p-3">Monthly Rent</th>
-                      <th className="p-3 rounded-r-lg print-hidden">Actions</th>
+                      <th className="p-3 rounded-r-lg print:hidden">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -1139,7 +1119,7 @@ ${unitMixDetails}
                             />
                           </div>
                         </td>
-                        <td className="p-3 print-hidden">
+                        <td className="p-3 print:hidden">
                           <button
                             onClick={() => removeUnit(unit.id)}
                             className="text-slate-400 hover:text-red-500 transition-colors"
@@ -1154,7 +1134,7 @@ ${unitMixDetails}
                 </table>
               </div>
 
-              <div className="mt-4 px-4 md:px-0 print-hidden">
+              <div className="mt-4 px-4 md:px-0 print:hidden">
                 <button
                   onClick={addUnit}
                   className="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
