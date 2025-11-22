@@ -1154,12 +1154,37 @@ ${unitMixDetails}
       </div>
 
       {/* FOOTER – CBRE / JLL style */}
-      <div className="max-w-6xl mx-auto mt-8 text-center text-xs text-slate-400 print:text-slate-700 border-t border-slate-200 pt-3">
-  <p>Prepared by Jonathan Sarrow, Realtor® | DRE# 02151231</p>
-  <p className="mt-1">
-    818-469-5309 • jonathan.sarrow@gmail.com
-  </p>
-</div>
+      {/* Footer with contact info + logo (screen & print) */}
+      <div className="max-w-6xl mx-auto mt-8 mb-4 border-t border-slate-200 pt-4 flex flex-col sm:flex-row items-start justify-between gap-4 text-xs text-slate-500 print:text-[10px]">
+        <div>
+          <div className="font-semibold text-slate-700 text-sm">
+            Jonathan Sarrow, Realtor®
+          </div>
+          <div>Phone: 818-469-5309</div>
+          <div>Email: jonathan.sarrow@gmail.com</div>
+          <div className="text-[0.6rem] text-slate-400 mt-1 max-w-md">
+            Brokered by SHE IS HOPE Realty. Information deemed reliable but not
+            guaranteed. Buyer and lender to verify all figures independently.
+          </div>
+        </div>
+
+        <div className="flex-shrink-0">
+          <img
+  src="/JS-contact-logo.png"
+  alt="Jonathan Sarrow Contact Logo"
+  className="h-16 w-auto print:h-14"
+  style={{ objectFit: 'contain' }}
+/>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto mb-6 text-center text-[0.65rem] text-slate-400 print:text-[8px]">
+        <p>
+          Generated via Multifamily ROI Analyzer. For estimation purposes only and
+          not a substitute for professional financial advice.
+        </p>
+      </div>
+    </div>
   );
 };
 
