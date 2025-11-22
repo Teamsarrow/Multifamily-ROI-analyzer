@@ -1148,10 +1148,26 @@ ${unitMixDetails}
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto mt-8 text-center text-xs text-slate-400">
-        <p>Generated via Multifamily ROI Analyzer. For estimation purposes only.</p>
-      </div>
-    </div>
+      {/* FOOTER – CBRE / JLL style */}
+<div className="max-w-6xl mx-auto mt-10 text-center text-[0.65rem] text-slate-500 border-t border-slate-200 pt-4 print:pt-2 print:mt-6">
+
+  <div className="font-semibold tracking-wide text-slate-600">
+    Jonathan Sarrow • Realtor® • DRE# 02151231
+  </div>
+
+  <div className="mt-1">
+    SHE IS HOPE Realty • Los Angeles, CA
+  </div>
+
+  <div className="mt-1">
+    Mobile: (818) 469–5309 • Email: jonathan@sheishoperealty.com
+  </div>
+
+  <div className="mt-1 text-slate-400 italic">
+    This analysis is for estimation purposes only and not a substitute for financial, tax, or legal advice.
+  </div>
+
+</div>
   );
 };
 
