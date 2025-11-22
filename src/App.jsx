@@ -469,10 +469,11 @@ ${unitMixDetails}
           {/* Left: logo + analysis label */}
           <div className="flex items-center gap-4">
             <img
-              src="/JS Realtor logo initials.png"
-              alt="Jonathan Sarrow Logo"
-              className="h-28 w-auto"
-            />
+  src="/JS-contact-logo.png.PNG"
+  alt="Jonathan Sarrow Contact Logo"
+  className="h-24 w-auto"
+  style={{ objectFit: "contain" }}
+/>
             <div>
               <div className="text-[0.7rem] font-semibold tracking-[0.18em] uppercase text-slate-700">
                 Multifamily Investment Analysis
