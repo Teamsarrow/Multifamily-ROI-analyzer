@@ -860,7 +860,7 @@ ${unitMixDetails}
   {/* Cash-on-Cash ROI */}
   <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
     <div className="kpi-title-long text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Cash-on<br />Cash ROI
+      Cash-on-Cash
     </div>
 
     <div className="kpi-value mt-1 font-extrabold text-slate-800">
@@ -868,7 +868,7 @@ ${unitMixDetails}
     </div>
 
     <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      Initial Cash
+      ROI
     </div>
   </div>
 
