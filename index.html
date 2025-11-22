@@ -10,6 +10,10 @@
 
     <style>
       @media print {
+        /* Ensure the browser allows scaled printing */
+body {
+  transform-origin: top left !important;
+}
         /* Reduce logo size in PDF header only */
         .print-logo {
           height: 70px !important;
