@@ -6,7 +6,6 @@ import {
   Trash2,
   Plus,
   Printer,
-  Building,
   TrendingUp,
   MapPin,
   Copy
@@ -259,149 +258,108 @@ ${unitMixDetails}
   };
 
   return (
-   <div className="max-w-6xl mx-auto mb-6 print-hidden">
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    {/* Left: Logo + analyzer label */}
-    <div className="flex items-center gap-4">
-      <img
-        src="/JS Realtor logo initials.png"
-        alt="Jonathan Sarrow Logo"
-        className="h-16 w-auto"
-      />
-      <div className="hidden sm:block">
-        <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
-          Multifamily Investment Analysis
-        </div>
-        <div className="text-xs text-slate-400 mt-1">
-          Prepared using Multifamily ROI Analyzer
-        </div>
-      </div>
-    </div>
-
-    {/* Right: Subject property + control buttons */}
-    <div className="flex flex-col items-stretch md:items-end gap-3 w-full md:w-auto">
-      <div className="text-right">
-        <div className="text-[0.65rem] uppercase tracking-[0.18em] text-slate-500">
-          Subject Property
-        </div>
-        <div className="text-sm font-semibold text-slate-900">
-          {address || '4-Unit Residential Property'}
-        </div>
-        {mlsNumber && (
-          <div className="text-xs text-slate-400 mt-0.5">MLS #{mlsNumber}</div>
-        )}
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
-        {copySuccess && (
-          <div className="bg-green-100 text-green-700 py-1 px-3 rounded-full text-xs flex items-center gap-2">
-            <Copy size={14} /> {copySuccess}
-          </div>
-        )}
-
-        <button
-          onClick={handleExportToText}
-          className="w-full sm:w-auto flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg shadow-md transition-colors text-xs font-medium"
-        >
-          <Copy size={16} />
-          Copy Text Report
-        </button>
-
-        <button
-          onClick={handlePrint}
-          className="w-full sm:w-auto flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition-colors text-xs font-medium"
-        >
-          <Printer size={16} />
-          Print / Save as PDF
-        </button>
-      </div>
-    </div>
-  </div>
-
-  {/* Thin divider line under header, CBRE-style */}
-  <div className="border-b border-slate-200 mt-4"></div>
-</div>         </div>
-          )}
-
-          <button
-            onClick={handleExportToText}
-            className="w-full sm:w-auto flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-6 py-2.5 rounded-lg shadow-md transition-colors font-medium"
-          >
-            <Copy size={18} />
-            Copy Text Report
-          </button>
-
-          <button
-            onClick={handlePrint}
-            className="w-full sm:w-auto flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg shadow-md transition-colors font-medium"
-          >
-            <Printer size={18} />
-            Print / Save as PDF
-          </button>
-        </div>
-      </div>
-
-      {/* Printable Header */}
-{/* Printable Header (for PDF / printouts) */}
-<div className="hidden print:block max-w-6xl mx-auto mb-6 pb-3 border-b border-slate-300">
-  <div className="flex justify-between items-center gap-4">
-    {/* Left: logo + analyzer label */}
-    <div className="flex items-center gap-4">
-      <img
-        src="/JS Realtor logo initials.png"
-        alt="Jonathan Sarrow Logo"
-        className="h-24 w-auto"
-      />
-      <div>
-        <div className="text-[0.7rem] font-semibold tracking-[0.18em] uppercase text-slate-700">
-          Multifamily Investment Analysis
-        </div>
-        <div className="text-[0.65rem] text-slate-500 mt-1">
-          Prepared by Jonathan Sarrow, Realtor®
-        </div>
-      </div>
-    </div>
-
-    {/* Right: subject property & date */}
-    <div className="text-right">
-      <div className="text-[0.65rem] uppercase tracking-[0.18em] text-slate-500">
-        Subject Property
-      </div>
-      <div className="text-sm font-semibold text-slate-900">
-        {address || 'Investment Property Prospectus'}
-      </div>
-      {mlsNumber && (
-        <div className="text-xs text-slate-500 mt-0.5">MLS #{mlsNumber}</div>
-      )}
-      <div className="text-[0.65rem] text-slate-500 mt-2">
-        Date Generated: {new Date().toLocaleDateString()}
-      </div>
-    </div>
-  </div>
-</div>     
-<div className="flex justify-between items-end">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">
-              {address || 'Investment Property Prospectus'}
-            </h1>
-            <p className="text-slate-600">
-              Projected Performance Report
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-4 print:bg-white">
+      {/* Header / Action Bar */}
+      <div className="max-w-6xl mx-auto mb-6 print:hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          {/* Left: Logo + analysis label */}
+          <div className="flex items-center gap-4">
+            <img
+              src="/JS Realtor logo initials.png"
+              alt="Jonathan Sarrow Logo"
+              className="h-16 w-auto"
+            />
+            <div>
+              <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
+                Multifamily Investment Analysis
+              </div>
+              <div className="text-xs text-slate-500 mt-1">
+                Prepared for:{' '}
+                <span className="font-semibold">
+                  {address || '4-Unit Residential Property'}
+                </span>
+              </div>
               {mlsNumber && (
-                <span className="ml-2 text-slate-400">• MLS #{mlsNumber}</span>
+                <div className="text-xs text-slate-400 mt-0.5">
+                  MLS #{mlsNumber}
+                </div>
               )}
-            </p>
-          </div>
-          <div className="text-right">
-            <div className="text-xs text-slate-500 uppercase tracking-wider">
-              Date Generated
             </div>
-            <div className="text-sm font-medium">
-              {new Date().toLocaleDateString()}
+          </div>
+
+          {/* Right: buttons & status */}
+          <div className="flex flex-col items-stretch md:items-end gap-2 w-full md:w-auto">
+            {copySuccess && (
+              <div className="bg-green-100 text-green-700 py-1 px-3 rounded-full text-xs flex items-center gap-2">
+                <Copy size={14} /> {copySuccess}
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+              <button
+                onClick={handleExportToText}
+                className="w-full sm:w-auto flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg shadow-md transition-colors text-xs font-medium"
+              >
+                <Copy size={16} />
+                Copy Text Report
+              </button>
+
+              <button
+                onClick={handlePrint}
+                className="w-full sm:w-auto flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition-colors text-xs font-medium"
+              >
+                <Printer size={16} />
+                Print / Save as PDF
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Thin divider line under header, CBRE-style */}
+        <div className="border-b border-slate-200 mt-4" />
+      </div>
+
+      {/* Printable Header (for PDF / printouts) */}
+      <div className="hidden print:block max-w-6xl mx-auto mb-6 pb-3 border-b border-slate-300">
+        <div className="flex justify-between items-center gap-4">
+          {/* Left: logo + analysis label */}
+          <div className="flex items-center gap-4">
+            <img
+              src="/JS Realtor logo initials.png"
+              alt="Jonathan Sarrow Logo"
+              className="h-24 w-auto"
+            />
+            <div>
+              <div className="text-[0.7rem] font-semibold tracking-[0.18em] uppercase text-slate-700">
+                Multifamily Investment Analysis
+              </div>
+              <div className="text-[0.65rem] text-slate-500 mt-1">
+                Prepared by Jonathan Sarrow, Realtor®
+              </div>
+            </div>
+          </div>
+
+          {/* Right: subject property & date */}
+          <div className="text-right">
+            <div className="text-[0.65rem] uppercase tracking-[0.18em] text-slate-500">
+              Subject Property
+            </div>
+            <div className="text-sm font-semibold text-slate-900">
+              {address || 'Investment Property Prospectus'}
+            </div>
+            {mlsNumber && (
+              <div className="text-xs text-slate-500 mt-0.5">
+                MLS #{mlsNumber}
+              </div>
+            )}
+            <div className="text-[0.65rem] text-slate-500 mt-2">
+              Date Generated: {new Date().toLocaleDateString()}
             </div>
           </div>
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT COLUMN: INPUTS */}
         <div className="lg:col-span-5 space-y-6">
