@@ -4,19 +4,46 @@
     <meta charset="UTF-8" />
     <title>Multifamily ROI Analyzer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Print-specific KPI styling -->
     <style>
       @media print {
-        .print-hidden {
-          display: none !important;
+        /* KPI value (middle number) */
+        .kpi-value {
+          font-size: 15pt !important;
+          line-height: 1.1 !important;
         }
-        .print-block {
-          display: block !important;
+
+        /* KPI title (top text) */
+        .kpi-title {
+          font-size: 7pt !important;
+          letter-spacing: 0.12em !important;
         }
-      </style>
+
+        /* KPI bottom label */
+        .kpi-sub {
+          font-size: 7pt !important;
+          letter-spacing: 0.1em !important;
+          margin-top: 2px !important;
+        }
+
+        /* KPI box height control */
+        .kpi-box {
+          height: 90px !important;
+          padding-top: 6px !important;
+          padding-bottom: 6px !important;
+        }
+      }
+    </style>
+
+    <!-- Tailwind via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="bg-slate-50">
+
+  <body class="antialiased bg-slate-50">
     <div id="root"></div>
+
+    <!-- Vite / React entry -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
