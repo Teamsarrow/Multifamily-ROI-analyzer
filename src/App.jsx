@@ -372,7 +372,7 @@ ${unitMixDetails}
           {/* Left: Logo + analysis label */}
           <div className="flex items-center gap-4">
             <img
-              src="/JS-contact-logo.png.PNG"
+              src="/JS-contact-logo.png"
               alt="Jonathan Sarrow Contact Logo"
               className="h-16 w-auto"
               style={{ objectFit: "contain" }}
@@ -471,7 +471,7 @@ ${unitMixDetails}
         <div className="flex justify-between items-center gap-4">
           <div className="flex items-center gap-4">
             <img
-              src="/JS-contact-logo.png.PNG"
+              src="/JS-contact-logo.png"
               alt="Jonathan Sarrow Contact Logo"
               className="h-18 w-auto"
               style={{ objectFit: "contain" }}
