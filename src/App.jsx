@@ -376,7 +376,7 @@ ${unitMixDetails}
   // --- JSX ---
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-4 print:bg-white">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-0 print:bg-white print:text-black">
       {/* Header / Action Bar (onscreen) */}
       <div className="max-w-6xl mx-auto mb-4 print:hidden">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -439,7 +439,7 @@ ${unitMixDetails}
       </div>
 
       {/* Printable Header (for PDF / printouts) */}
-      <div className="hidden print:block max-w-6xl mx-auto mb-6 pb-3 border-b border-slate-300">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 print:grid-cols-1 gap-6">       
         <div className="flex justify-between items-center gap-4">
           {/* Left: logo + analysis label */}
           <div className="flex items-center gap-4">
@@ -870,7 +870,7 @@ ${unitMixDetails}
         {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
         <div className="lg:col-span-7 space-y-6">
           {/* KPI Cards – aligned strip */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 print:grid-cols-4 gap-4 print:gap-3">
             {/* Annual Cash Flow */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center px-4 py-3 flex flex-col justify-between h-28">
               <div className="min-h-[1.5rem] text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
@@ -1155,21 +1155,12 @@ ${unitMixDetails}
       </div>
 
       {/* FOOTER – CBRE / JLL style */}
-      <div className="max-w-6xl mx-auto mt-10 text-center text-[0.65rem] text-slate-500 border-t border-slate-200 pt-4 print:pt-2 print:mt-6">
-        <div className="font-semibold tracking-wide text-slate-600">
-          Jonathan Sarrow • Realtor® • DRE# 02151231
-        </div>
-        <div className="mt-1">
-          SHE IS HOPE Realty • Los Angeles, CA
-        </div>
-        <div className="mt-1">
-          Mobile: (213) 713–6643 • Email: jonathan@example.com
-        </div>
-        <div className="mt-1 text-slate-400 italic">
-          Generated via Multifamily ROI Analyzer. For estimation purposes only; not a substitute for financial, tax, or legal advice.
-        </div>
-      </div>
-    </div>
+      <div className="max-w-6xl mx-auto mt-8 text-center text-xs text-slate-400 print:text-slate-700 border-t border-slate-200 pt-3">
+  <p>Prepared by Jonathan Sarrow, Realtor® | DRE# 02151231</p>
+  <p className="mt-1">
+    818-469-5309 • jonathan.sarrow@gmail.com
+  </p>
+</div>
   );
 };
 
