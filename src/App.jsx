@@ -265,10 +265,10 @@ ${unitMixDetails}
           {/* Left: Logo + analysis label */}
           <div className="flex items-center gap-4">
             <img
-  src="/JS Realtor logo initials.png"
-  alt="Jonathan Sarrow Logo"
-  className="h-20 w-auto"
-/>
+              src="/JS Realtor logo initials.png"
+              alt="Jonathan Sarrow Logo"
+              className="h-20 w-auto"
+            />
             <div>
               <div className="text-[0.8rem] font-semibold tracking-[0.18em] uppercase text-slate-500">
                 Multifamily Investment Analysis
@@ -315,7 +315,7 @@ ${unitMixDetails}
           </div>
         </div>
 
-        {/* Thin divider line under header, CBRE-style */}
+        {/* Thin divider line under header */}
         <div className="border-b border-slate-200 mt-4" />
       </div>
 
@@ -325,10 +325,10 @@ ${unitMixDetails}
           {/* Left: logo + analysis label */}
           <div className="flex items-center gap-4">
             <img
-  src="/JS Realtor logo initials.png"
-  alt="Jonathan Sarrow Logo"
-  className="h-28 w-auto"
-/>
+              src="/JS Realtor logo initials.png"
+              alt="Jonathan Sarrow Logo"
+              className="h-28 w-auto"
+            />
             <div>
               <div className="text-[0.7rem] font-semibold tracking-[0.18em] uppercase text-slate-700">
                 Multifamily Investment Analysis
@@ -359,7 +359,7 @@ ${unitMixDetails}
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main Content: 2-column layout */}
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT COLUMN: INPUTS */}
         <div className="lg:col-span-5 space-y-6">
@@ -699,71 +699,76 @@ ${unitMixDetails}
             </div>
           </section>
         </div>
-{/* KPI Cards – Fully Aligned */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
-  {/* Annual Cash Flow */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
-    <div className="flex flex-col">
-      <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-        Annual<br/>Cash Flow
-      </div>
-      <div className="mt-2 text-2xl font-extrabold text-green-700">
-        {formatCurrency(annualCashFlow)}
-      </div>
-    </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      Per Year
-    </div>
-  </div>
+        {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
+        <div className="lg:col-span-7 space-y-6">
+          {/* KPI Cards – fixed label height so numbers align */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Annual Cash Flow */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-32 flex flex-col items-center">
+              <div className="h-10 flex flex-col justify-center">
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  Annual Cash Flow
+                </div>
+              </div>
+              <div
+                className={`mt-1 text-2xl font-extrabold ${
+                  annualCashFlow >= 0 ? 'text-green-700' : 'text-red-700'
+                }`}
+              >
+                {formatCurrency(annualCashFlow)}
+              </div>
+              <div className="mt-2 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                Per Year
+              </div>
+            </div>
 
-  {/* Cash-on-Cash ROI */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
-    <div className="flex flex-col">
-      <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-        Cash-On-Cash<br/>ROI
-      </div>
-      <div className="mt-2 text-2xl font-extrabold text-slate-800">
-        {formatPercent(cashOnCashROI)}
-      </div>
-    </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      On Cash
-    </div>
-  </div>
+            {/* Cash-on-Cash ROI */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-32 flex flex-col items-center">
+              <div className="h-10 flex flex-col justify-center">
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  Cash-on-Cash ROI
+                </div>
+              </div>
+              <div className="mt-1 text-2xl font-extrabold text-slate-800">
+                {formatPercent(cashOnCashROI)}
+              </div>
+              <div className="mt-2 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                On Initial Cash
+              </div>
+            </div>
 
-  {/* Cap Rate — FIXED: split into two lines */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
-    <div className="flex flex-col">
-      <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-        Cap<br/>Rate
-      </div>
-      <div className="mt-2 text-2xl font-extrabold text-slate-800">
-        {formatPercent(capRate)}
-      </div>
-    </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      On Price
-    </div>
-  </div>
+            {/* Cap Rate */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-32 flex flex-col items-center">
+              <div className="h-10 flex flex-col justify-center">
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  Cap Rate
+                </div>
+              </div>
+              <div className="mt-1 text-2xl font-extrabold text-slate-800">
+                {formatPercent(capRate)}
+              </div>
+              <div className="mt-2 text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                On Purchase Price
+              </div>
+            </div>
 
-  {/* DSCR — FIXED: move “Yellow / Borderline” ABOVE the number */}
-  <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
-    <div className="flex flex-col">
-      <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-        DSCR<br/>{dscrText}
-      </div>
-      <div className="mt-2 text-2xl font-extrabold text-slate-800">
-        {formatNumber(dscr)}
-      </div>
-    </div>
-    <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      Coverage
-    </div>
-  </div>
+            {/* DSCR */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center h-32 flex flex-col items-center">
+              <div className="h-10 flex flex-col justify-center">
+                <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                  DSCR
+                </div>
+              </div>
+              <div className="mt-1 text-2xl font-extrabold text-slate-800">
+                {formatNumber(dscr)}
+              </div>
+              <div className="mt-2 text-[0.65rem] text-slate-500 truncate max-w-[95%]">
+                {dscrText}
+              </div>
+            </div>
+          </div>
 
-</div>
-      </div>
           {/* Pro Forma Annual Financials */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
