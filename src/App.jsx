@@ -951,11 +951,11 @@ ${unitMixDetails}
     </div>
   </div>
 
-  {/* DSCR — aligned like other KPIs */}
+ {/* DSCR */}
 <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center flex flex-col justify-between h-32">
   <div className="flex flex-col">
     <div className="text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      DSCR
+      Debt Service<br />Coverage
     </div>
     <div className="mt-2 text-2xl font-extrabold text-slate-800">
       {formatNumber(dscr)}
@@ -963,6 +963,7 @@ ${unitMixDetails}
   </div>
   <div className="text-[0.65rem] text-slate-400 uppercase tracking-wide">
     {dscrText}
+  </div>
 </div>
 
           {/* Pro Forma Annual Financials */}
