@@ -140,10 +140,10 @@ const App = () => {
     dscr === 0
       ? "N/A"
       : dscr < 1.2
-      ? "Red (Below Lender Min.)"
+      ? "Below Lender Min."
       : dscr < 1.35
-      ? "Yellow (Borderline)"
-      : "Green (Strong)";
+      ? "Borderline"
+      : "Strong";
 
   // --- Scenario persistence (localStorage) ---
 
@@ -859,8 +859,8 @@ ${unitMixDetails}
 
   {/* Cash-on-Cash ROI */}
   <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
-    <div className="kpi-title-long text-[0.6rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Cash-on-Cash<br />ROI
+    <div className="kpi-title-long text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+      Cash-on<br />Cash ROI
     </div>
 
     <div className="kpi-value mt-1 font-extrabold text-slate-800">
