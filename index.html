@@ -10,42 +10,42 @@
 
     <!-- Print-specific KPI sizing + layout -->
     <style>
-      @media print {
-        /* KPI middle number */
-        .kpi-value {
-          font-size: 13pt !important;
-          line-height: 1.05 !important;
-          word-break: break-word !important;
-        }
+  @media print {
+    /* KPI value (middle number) */
+    .kpi-value {
+      font-size: 13pt !important;   /* slightly smaller to keep big $ values inside */
+      line-height: 1.1 !important;
+    }
 
-        /* KPI top label (title) */
-        .kpi-title {
-          font-size: 7pt !important;
-          letter-spacing: 0.12em !important;
-        }
+    /* KPI title (top text) */
+    .kpi-title {
+      font-size: 7pt !important;
+      letter-spacing: 0.12em !important;
+    }
 
-        /* KPI bottom label (subtext) */
-        .kpi-sub {
-          font-size: 7pt !important;
-          letter-spacing: 0.10em !important;
-          margin-top: 2px !important;
-        }
+    /* Longer KPI title (Cash-on-Cash ROI) */
+    .kpi-title-long {
+      font-size: 6pt !important;          /* a bit smaller so it stays inside the box */
+      letter-spacing: 0.10em !important;
+      line-height: 1.05 !important;
+    }
 
-        /* KPI box height / vertical spacing */
-        .kpi-box {
-          height: 120px !important;
-          padding-top: 10px !important;
-          padding-bottom: 10px !important;
-        }
+    /* KPI bottom label */
+    .kpi-sub {
+      font-size: 7pt !important;
+      letter-spacing: 0.10em !important;
+      margin-top: 2px !important;
+    }
 
-        /* Ensure colors render correctly in print */
-        html,
-        body {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-      }
-    </style>
+    /* KPI box height control */
+    .kpi-box {
+      height: 90px !important;
+      padding-top: 6px !important;
+      padding-bottom: 6px !important;
+      box-sizing: border-box !important;
+    }
+  }
+</style>
   </head>
 
   <body class="bg-slate-50">
