@@ -366,7 +366,7 @@ ${unitMixDetails}
 
   // --- Render ---
 return (
-  <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-0 print:bg-white print-remove-top-padding">
+  <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-0 print:bg-white print-remove-top-padding print-shift-up">
     {/* Header / Action Bar */}
     ...
       <div className="max-w-6xl mx-auto mb-4 print:hidden">
