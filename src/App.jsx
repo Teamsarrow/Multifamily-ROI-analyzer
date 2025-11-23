@@ -469,7 +469,7 @@ return (
       </div>
 
       {/* Printable Header (for PDF) */}
-      <div className="hidden print:block max-w-6xl mx-auto mb-4 pb-3 border-b border-slate-300">
+      <div className="hidden print:block max-w-6xl mx-auto mb-4 pb-3 border-b border-slate-300 print-header">
         <div className="flex justify-between items-center gap-4">
           <div className="flex items-center gap-4">
             <img
