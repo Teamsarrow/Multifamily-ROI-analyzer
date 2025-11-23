@@ -9,73 +9,77 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-      @media print {
-        /* Remove top padding from the main container on PDF */
-        .print-remove-top-padding {
-          padding-top: 0 !important;
-          margin-top: 0 !important;
-        }
+  @media print {
+    /* Remove top padding from the main container on PDF */
+    .print-remove-top-padding {
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
 
-        /* Remove extra margin/padding above the printable header itself */
-        .print-header {
-          margin-top: 0 !important;
-          padding-top: 0 !important;
-        }
+    /* Visually shift the whole app upward on the printed page */
+    .print-shift-up {
+      transform: translateY(-0.5in) !important;  /* tweak to -0.4in or -0.6in if needed */
+    }
 
-        @page {
-          margin-top: 0.5in !important;
-          margin-left: 0.5in;
-          margin-right: 0.5in;
-          margin-bottom: 0.5in;
-        }
+    /* Remove extra margin/padding above the printable header itself */
+    .print-header {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
 
-        /* Ensure the browser allows scaled printing */
-        body {
-          transform-origin: top left !important;
-        }
+    @page {
+      margin-top: 0.5in !important;
+      margin-left: 0.5in;
+      margin-right: 0.5in;
+      margin-bottom: 0.5in;
+    }
 
-        /* Reduce logo size in PDF header only */
-        .print-logo {
-          height: 70px !important;
-          width: auto !important;
-        }
+    /* Ensure the browser allows scaled printing */
+    body {
+      transform-origin: top left !important;
+    }
 
-        /* KPI title (top text) */
-        .kpi-title,
-        .kpi-title-long {
-          font-size: 7pt !important;
-          letter-spacing: 0.12em !important;
-          line-height: 1.1 !important;
-        }
+    /* Reduce logo size in PDF header only */
+    .print-logo {
+      height: 70px !important;
+      width: auto !important;
+    }
 
-        /* KPI value (large number) */
-        .kpi-value {
-          font-size: 13pt !important;
-          line-height: 1.1 !important;
-        }
+    /* KPI title (top text) */
+    .kpi-title,
+    .kpi-title-long {
+      font-size: 7pt !important;
+      letter-spacing: 0.12em !important;
+      line-height: 1.1 !important;
+    }
 
-        /* KPI bottom label */
-        .kpi-sub {
-          font-size: 7pt !important;
-          letter-spacing: 0.10em !important;
-          margin-top: 2px !important;
-        }
+    /* KPI value (large number) */
+    .kpi-value {
+      font-size: 13pt !important;
+      line-height: 1.1 !important;
+    }
 
-        /* KPI box */
-        .kpi-box {
-          height: 90px !important;
-          padding-top: 6px !important;
-          padding-bottom: 6px !important;
-          box-sizing: border-box !important;
-        }
+    /* KPI bottom label */
+    .kpi-sub {
+      font-size: 7pt !important;
+      letter-spacing: 0.10em !important;
+      margin-top: 2px !important;
+    }
 
-        /* Nudge Cash-on-cash value closer to its title (PDF only) */
-        .kpi-cashoncash .kpi-value {
-          margin-top: 3px !important; /* adjust if ever needed */
-        }
-      }
-    </style>
-  </head>
+    /* KPI box */
+    .kpi-box {
+      height: 90px !important;
+      padding-top: 6px !important;
+      padding-bottom: 6px !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Nudge Cash-on-cash value closer to its title (PDF only) */
+    .kpi-cashoncash .kpi-value {
+      margin-top: 3px !important;
+    }
+  }
+</style>  </head>
 
   <body class="bg-slate-50">
     <div id="root"></div>
