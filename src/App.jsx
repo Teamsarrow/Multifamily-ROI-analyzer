@@ -364,10 +364,9 @@ ${unitMixDetails}
 
   // --- Render ---
 
-  // --- Render ---
-return (
-  <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-4 print:bg-white">
-    {/* Header / Action Bar */}
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-4 print:bg-white">
+      {/* Header / Action Bar */}
       <div className="max-w-6xl mx-auto mb-4 print:hidden">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           {/* Left: Logo + analysis label */}
@@ -468,15 +467,15 @@ return (
       </div>
 
       {/* Printable Header (for PDF) */}
-      <div className="hidden print:block max-w-6xl mx-auto mb-4 pb-3 border-b border-slate-300 print-header">
+      <div className="hidden print:block max-w-6xl mx-auto mb-4 pb-3 border-b border-slate-300">
         <div className="flex justify-between items-center gap-4">
           <div className="flex items-center gap-4">
             <img
-  src="/JS-contact-logo.png"
-  alt="Jonathan Sarrow Contact Logo"
-  className="h-18 w-auto print-logo"
-  style={{ objectFit: "contain" }}
-/>
+              src="/JS-contact-logo.png"
+              alt="Jonathan Sarrow Contact Logo"
+              className="h-16 w-auto print-logo"
+              style={{ objectFit: "contain" }}
+            />
           </div>
           <div className="text-right">
             <div className="text-[0.65rem] uppercase tracking-[0.16em] text-slate-500">
@@ -840,72 +839,81 @@ return (
 
         {/* RIGHT COLUMN: OUTPUT & UNIT MIX */}
         <div className="lg:col-span-7 space-y-6">
-{/* KPI Strip */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-  {/* Annual Cash Flow */}
-  <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
-    <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Annual<br />Cash Flow
-    </div>
+          {/* KPI Strip */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Annual Cash Flow */}
+            <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
+              <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                Annual
+                <br />
+                Cash Flow
+              </div>
 
-    <div
-      className={`kpi-value mt-1 font-extrabold ${
-        annualCashFlow >= 0 ? "text-green-700" : "text-red-700"
-      }`}
-    >
-      {formatCurrency(annualCashFlow)}
-    </div>
+              <div
+                className={`kpi-value mt-1 font-extrabold ${
+                  annualCashFlow >= 0 ? "text-green-700" : "text-red-700"
+                }`}
+              >
+                {formatCurrency(annualCashFlow)}
+              </div>
 
-    <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      Per Year
-    </div>
-  </div>
+              <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                Per Year
+              </div>
+            </div>
 
-  {/* Cash-on-cash ROI */}
-<div className="kpi-box kpi-cashoncash bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
-  <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-    Cash-on-cash
-  </div>
+            {/* Cash-on-cash ROI */}
+            <div className="kpi-box kpi-cashoncash bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
+              <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                Cash-on-cash
+              </div>
 
-  {/* Value uses extra margin on web, tighter margin in print */}
-  <div className="kpi-value mt-3 print:mt-1 font-extrabold text-slate-800">
-    {formatPercent(cashOnCashROI)}
-  </div>
+              {/* Value uses extra margin on web, tighter margin in print */}
+              <div className="kpi-value mt-3 print:mt-1 font-extrabold text-slate-800">
+                {formatPercent(cashOnCashROI)}
+              </div>
 
-  <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
-    ROI
-  </div>
-</div>
-  {/* Cap Rate */}
-  <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
-    <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      Cap<br />Rate
-    </div>
+              <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                ROI
+              </div>
+            </div>
 
-    <div className="kpi-value mt-1 font-extrabold text-slate-800">
-      {formatPercent(capRate)}
-    </div>
+            {/* Cap Rate */}
+            <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
+              <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                Cap
+                <br />
+                Rate
+              </div>
 
-    <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      On Price
-    </div>
-  </div>
+              <div className="kpi-value mt-1 font-extrabold text-slate-800">
+                {formatPercent(capRate)}
+              </div>
 
-  {/* DSCR */}
-  <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
-    <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
-      DSCR<br />Value
-    </div>
+              <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                On Price
+              </div>
+            </div>
 
-    <div className="kpi-value mt-1 font-extrabold text-slate-800">
-      {formatNumber(dscr)}
-    </div>
+            {/* DSCR */}
+            <div className="kpi-box bg-white rounded-xl shadow-sm border border-slate-200 text-center h-28 flex flex-col justify-center">
+              <div className="kpi-title text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-slate-500 leading-tight">
+                DSCR
+                <br />
+                Value
+              </div>
 
-    <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
-      {dscrStatus}
-    </div>
-  </div>
-</div>       {/* Pro Forma Annual Financials */}
+              <div className="kpi-value mt-1 font-extrabold text-slate-800">
+                {formatNumber(dscr)}
+              </div>
+
+              <div className="kpi-sub text-[0.65rem] text-slate-400 uppercase tracking-wide">
+                {dscrStatus}
+              </div>
+            </div>
+          </div>
+
+          {/* Pro Forma Annual Financials */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
               <h3 className="font-semibold text-slate-800 flex items-center gap-2">
@@ -1130,13 +1138,14 @@ return (
           </section>
         </div>
       </div>
-      {/* Footer Disclaimer */}
-<div className="text-center text-[0.65rem] text-slate-400 mt-12 mb-6 print:text-[0.55rem] print:mt-16 print:mb-0">
-  *All calculations are estimates only and are not guaranteed. Buyer and investor to verify all figures independently.
-</div>
 
-</div>
-);
+      {/* Footer Disclaimer */}
+      <div className="text-center text-[0.65rem] text-slate-400 mt-12 mb-6 print:text-[0.55rem] print:mt-16 print:mb-0">
+        *All calculations are estimates only and are not guaranteed. Buyer and
+        investor to verify all figures independently.
+      </div>
+    </div>
+  );
 };
 
 export default App;
