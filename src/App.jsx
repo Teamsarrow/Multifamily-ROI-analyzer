@@ -368,7 +368,6 @@ ${unitMixDetails}
 return (
   <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 print:p-0 print:bg-white print-remove-top-padding print-shift-up">
     {/* Header / Action Bar */}
-    ...
       <div className="max-w-6xl mx-auto mb-4 print:hidden">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           {/* Left: Logo + analysis label */}
