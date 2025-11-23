@@ -10,21 +10,30 @@
 
     <style>
       @media print {
-       /* Remove top padding from the main container on PDF */
-.print-remove-top-padding {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
+        /* Remove top padding from the main container on PDF */
+        .print-remove-top-padding {
+          padding-top: 0 !important;
+          margin-top: 0 !important;
+        }
+
+        /* Remove extra margin/padding above the printable header itself */
+        .print-header {
+          margin-top: 0 !important;
+          padding-top: 0 !important;
+        }
+
         @page {
-  margin-top: 0.5in !important;
-  margin-left: 0.5in;
-  margin-right: 0.5in;
-  margin-bottom: 0.5in;
-}
+          margin-top: 0.5in !important;
+          margin-left: 0.5in;
+          margin-right: 0.5in;
+          margin-bottom: 0.5in;
+        }
+
         /* Ensure the browser allows scaled printing */
-body {
-  transform-origin: top left !important;
-}
+        body {
+          transform-origin: top left !important;
+        }
+
         /* Reduce logo size in PDF header only */
         .print-logo {
           height: 70px !important;
@@ -61,9 +70,9 @@ body {
         }
 
         /* Nudge Cash-on-cash value closer to its title (PDF only) */
-.kpi-cashoncash .kpi-value {
-  margin-top: 3px !important;   /* try -2px; if still a hair off, use -3px */
-}
+        .kpi-cashoncash .kpi-value {
+          margin-top: 3px !important; /* adjust if ever needed */
+        }
       }
     </style>
   </head>
